@@ -46,7 +46,7 @@ WritePartyMenuTilemap:
 	push af
 	set NO_TEXT_SCROLL, [hl]
 	xor a
-	ld [hBGMapMode], a
+	ldh [hBGMapMode], a
 	hlcoord 0, 0
 	ld bc, SCREEN_WIDTH * SCREEN_HEIGHT
 	ld a, " "
@@ -84,7 +84,7 @@ PlacePartyNicknames:
 	and a
 	jr z, .end
 	ld c, a
-	ld b, $0
+	ld b, 0
 .loop
 	push bc
 	push hl
@@ -119,7 +119,7 @@ PlacePartyHPBar:
 	and a
 	ret z
 	ld c, a
-	ld b, $0
+	ld b, 0
 	hlcoord 11, 2
 .loop
 	push bc
@@ -185,7 +185,7 @@ PlacePartyMenuHPDigits:
 	and a
 	ret z
 	ld c, a
-	ld b, $0
+	ld b, 0
 	hlcoord 13, 1
 .loop
 	push bc
@@ -246,10 +246,10 @@ PlacePartyMonLevel:
 	jr nc, .ThreeDigits
 	ld a, "<LV>"
 	ld [hli], a
-	lb bc, PRINTNUM_RIGHTALIGN | 1, 2
+	lb bc, PRINTNUM_LEFTALIGN | 1, 2
 	; jr .okay
 .ThreeDigits:
-	lb bc, PRINTNUM_RIGHTALIGN | 1, 3
+	lb bc, PRINTNUM_LEFTALIGN | 1, 3
 ; .okay
 	call PrintNum
 
@@ -590,7 +590,7 @@ InitPartyMenuGFX:
 	ret z
 	ld c, a
 	xor a
-	ld [hObjectStructIndexBuffer], a
+	ldh [hObjectStructIndexBuffer], a
 .loop
 	push bc
 	push hl
@@ -598,9 +598,9 @@ InitPartyMenuGFX:
 	ld a, BANK(LoadMenuMonIcon)
 	ld e, MONICON_PARTYMENU
 	rst FarCall
-	ld a, [hObjectStructIndexBuffer]
+	ldh a, [hObjectStructIndexBuffer]
 	inc a
-	ld [hObjectStructIndexBuffer], a
+	ldh [hObjectStructIndexBuffer], a
 	pop hl
 	pop bc
 	dec c
@@ -682,7 +682,7 @@ PartyMenuSelect:
 	cp b
 	jr z, .exitmenu ; CANCEL
 	ld [wPartyMenuCursor], a
-	ld a, [hJoyLast]
+	ldh a, [hJoyLast]
 	ld b, a
 	bit B_BUTTON_F, b
 	jr nz, .exitmenu ; B button
@@ -712,7 +712,7 @@ PartyMenuSelect:
 PrintPartyMenuText:
 	hlcoord 0, 14
 	lb bc, 2, 18
-	call TextBox
+	call Textbox
 	ld a, [wPartyCount]
 	and a
 	jr nz, .haspokemon
@@ -792,66 +792,56 @@ PrintPartyMenuActionText:
 
 .MenuActionTexts:
 ; entries correspond to PARTYMENUTEXT_* constants
-	dw .Text_CuredOfPoison
-	dw .Text_BurnWasHealed
-	dw .Text_Defrosted
-	dw .Text_WokeUp
-	dw .Text_RidOfParalysis
-	dw .Text_RecoveredSomeHP
-	dw .Text_HealthReturned
-	dw .Text_Revitalized
-	dw .Text_GrewToLevel
-	dw .Text_CameToItsSenses
+	dw .CuredOfPoisonText
+	dw .BurnWasHealedText
+	dw .WasDefrostedText
+	dw .WokeUpText
+	dw .RidOfParalysisText
+	dw .RecoveredSomeHPText
+	dw .HealthReturnedText
+	dw .RevitalizedText
+	dw .GrewToLevelText
+	dw .CameToItsSensesText
 
-.Text_RecoveredSomeHP:
-	; recovered @ HP!
-	text_jump UnknownText_0x1bc0a2
-	db "@"
+.RecoveredSomeHPText:
+	text_far _RecoveredSomeHPText
+	text_end
 
-.Text_CuredOfPoison:
-	; 's cured of poison.
-	text_jump UnknownText_0x1bc0bb
-	db "@"
+.CuredOfPoisonText:
+	text_far _CuredOfPoisonText
+	text_end
 
-.Text_RidOfParalysis:
-	; 's rid of paralysis.
-	text_jump UnknownText_0x1bc0d2
-	db "@"
+.RidOfParalysisText:
+	text_far _RidOfParalysisText
+	text_end
 
-.Text_BurnWasHealed:
-	; 's burn was healed.
-	text_jump UnknownText_0x1bc0ea
-	db "@"
+.BurnWasHealedText:
+	text_far _BurnWasHealedText
+	text_end
 
-.Text_Defrosted:
-	; was defrosted.
-	text_jump UnknownText_0x1bc101
-	db "@"
+.WasDefrostedText:
+	text_far _WasDefrostedText
+	text_end
 
-.Text_WokeUp:
-	; woke up.
-	text_jump UnknownText_0x1bc115
-	db "@"
+.WokeUpText:
+	text_far _WokeUpText
+	text_end
 
-.Text_HealthReturned:
-	; 's health returned.
-	text_jump UnknownText_0x1bc123
-	db "@"
+.HealthReturnedText:
+	text_far _HealthReturnedText
+	text_end
 
-.Text_Revitalized:
-	; is revitalized.
-	text_jump UnknownText_0x1bc13a
-	db "@"
+.RevitalizedText:
+	text_far _RevitalizedText
+	text_end
 
-.Text_GrewToLevel:
-	; grew to level @ !@ @
-	text_jump UnknownText_0x1bc14f
-	db "@"
+.GrewToLevelText:
+	text_far _GrewToLevelText
+	text_end
 
-.Text_CameToItsSenses:
-	; came to its senses.
-	text_jump UnknownText_0x1bc16e
-	db "@"
+.CameToItsSensesText:
+	text_far _CameToItsSensesText
+	text_end
 
 .PrintText:
 	ld e, a

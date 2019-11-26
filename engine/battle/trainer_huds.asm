@@ -1,6 +1,6 @@
 BattleStart_TrainerHuds:
 	ld a, $e4
-	ld [rOBP0], a
+	ldh [rOBP0], a
 	call LoadBallIconGFX
 	call ShowPlayerMonsRemaining
 	ld a, [wBattleMode]
@@ -10,7 +10,7 @@ BattleStart_TrainerHuds:
 
 EnemySwitch_TrainerHud:
 	ld a, $e4
-	ld [rOBP0], a
+	ldh [rOBP0], a
 	call LoadBallIconGFX
 	jp ShowOTTrainerMonsRemaining
 
@@ -237,7 +237,7 @@ _ShowLinkBattleParticipants:
 	hlcoord 2, 3
 	ld b, 9
 	ld c, 14
-	call TextBox
+	call Textbox
 	hlcoord 4, 5
 	ld de, wPlayerName
 	call PlaceString
@@ -253,5 +253,5 @@ _ShowLinkBattleParticipants:
 	call GetSGBLayout
 	call SetPalettes
 	ld a, $e4
-	ld [rOBP0], a
+	ldh [rOBP0], a
 	ret

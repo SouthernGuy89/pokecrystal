@@ -1,4 +1,4 @@
-	const_def 2 ; object constants
+	object_const_def ; object_event constants
 	const FASTSHIPCABINS_NNW_NNE_NE_COOLTRAINER_M
 	const FASTSHIPCABINS_NNW_NNE_NE_COOLTRAINER_F
 	const FASTSHIPCABINS_NNW_NNE_NE_SUPER_NERD
@@ -82,22 +82,22 @@ FastShipLazySailorScript:
 	playmusic MUSIC_HIKER_ENCOUNTER
 	faceplayer
 	opentext
-	writetext UnknownText_0x75812
+	writetext SailorStanlySeenText
 	waitbutton
 	closetext
-	winlosstext UnknownText_0x75897, 0
+	winlosstext SailorStanlyBeatenText, 0
 	loadtrainer SAILOR, STANLY
 	startbattle
 	reloadmap
 	special HealParty
 	setevent EVENT_BEAT_SAILOR_STANLY
 	opentext
-	writetext UnknownText_0x758b1
+	writetext SailorStanlyAfterBattleText
 	waitbutton
 	closetext
 	setevent EVENT_FAST_SHIP_LAZY_SAILOR
 	setmapscene FAST_SHIP_B1F, SCENE_FINISHED
-	checkcode VAR_FACING
+	readvar VAR_FACING
 	ifequal RIGHT, .Movement2
 	applymovement FASTSHIPCABINS_NNW_NNE_NE_SAILOR, FastShipLazySailorLeavesMovement1
 	playsound SFX_EXIT_BUILDING
@@ -200,7 +200,7 @@ HikerNolandAfterBattleText:
 	line "KANTO?"
 	done
 
-UnknownText_0x75812:
+SailorStanlySeenText:
 	text "Yeah, I'm a sail-"
 	line "or, all right."
 
@@ -215,12 +215,12 @@ UnknownText_0x75812:
 	line "Let's battle!"
 	done
 
-UnknownText_0x75897:
+SailorStanlyBeatenText:
 	text "Sorry! It's all my"
 	line "fault!"
 	done
 
-UnknownText_0x758b1:
+SailorStanlyAfterBattleText:
 	text "Being a sailor, I"
 	line "have to do phys-"
 	cont "ical labor. It's"

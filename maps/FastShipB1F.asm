@@ -1,4 +1,4 @@
-	const_def 2 ; object constants
+	object_const_def ; object_event constants
 	const FASTSHIPB1F_SAILOR1
 	const FASTSHIPB1F_SAILOR2
 	const FASTSHIPB1F_SAILOR3
@@ -57,7 +57,7 @@ FastShipB1FSailorScript:
 	iftrue .LazySailor
 	checkevent EVENT_FAST_SHIP_INFORMED_ABOUT_LAZY_SAILOR
 	iftrue .AlreadyInformed
-	writetext UnknownText_0x7687b
+	writetext FastShipB1FOnDutySailorText
 	waitbutton
 	closetext
 	setevent EVENT_FAST_SHIP_INFORMED_ABOUT_LAZY_SAILOR
@@ -65,13 +65,13 @@ FastShipB1FSailorScript:
 	end
 
 .AlreadyInformed:
-	writetext UnknownText_0x76907
+	writetext FastShipB1FOnDutySailorRefusedText
 	waitbutton
 	closetext
 	end
 
 .LazySailor:
-	writetext UnknownText_0x7692e
+	writetext FastShipB1FOnDutySailorThanksText
 	checkevent EVENT_FAST_SHIP_FOUND_GIRL
 	iffalse .NotFoundGirl
 	waitbutton
@@ -79,14 +79,14 @@ FastShipB1FSailorScript:
 	end
 
 .NotFoundGirl:
-	buttonsound
-	writetext UnknownText_0x7696d
+	promptbutton
+	writetext FastShipB1FOnDutySailorSawLittleGirlText
 	waitbutton
 	closetext
 	end
 
 .FirstTime:
-	writetext UnknownText_0x7699d
+	writetext FastShipB1FOnDutySailorDirectionsText
 	waitbutton
 	closetext
 	end
@@ -218,7 +218,7 @@ FashShipB1FSailorBlocksLeftMovement:
 	turn_head DOWN
 	step_end
 
-UnknownText_0x7687b:
+FastShipB1FOnDutySailorText:
 	text "Hey, kid. Could I"
 	line "get you to look"
 	cont "for my buddy?"
@@ -232,14 +232,14 @@ UnknownText_0x7687b:
 	cont "duty right now."
 	done
 
-UnknownText_0x76907:
+FastShipB1FOnDutySailorRefusedText:
 	text "Oh, gee…"
 
 	para "The CAPTAIN will"
 	line "be furious…"
 	done
 
-UnknownText_0x7692e:
+FastShipB1FOnDutySailorThanksText:
 	text "Thanks, kid!"
 	line "I chewed him out"
 
@@ -247,14 +247,14 @@ UnknownText_0x7692e:
 	line "slacking off!"
 	done
 
-UnknownText_0x7696d:
+FastShipB1FOnDutySailorSawLittleGirlText:
 	text "A little girl?"
 
 	para "I may have seen"
 	line "her go by here."
 	done
 
-UnknownText_0x7699d:
+FastShipB1FOnDutySailorDirectionsText:
 	text "The dining room is"
 	line "up ahead."
 

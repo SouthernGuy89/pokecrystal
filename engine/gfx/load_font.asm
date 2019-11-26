@@ -22,7 +22,7 @@ _LoadStandardFont::
 	ld de, Font
 	ld hl, vTiles1
 	lb bc, BANK(Font), 128 ; "A" to "9"
-	ld a, [rLCDC]
+	ldh a, [rLCDC]
 	bit rLCDC_ENABLE, a
 	jp z, Copy1bpp
 
@@ -75,7 +75,7 @@ _LoadFontsBattleExtra::
 	jr LoadFrame
 
 LoadFrame:
-	ld a, [wTextBoxFrame]
+	ld a, [wTextboxFrame]
 	maskbits NUM_FRAMES
 	ld bc, 6 * LEN_1BPP_TILE
 	ld hl, Frames
@@ -86,8 +86,8 @@ LoadFrame:
 	lb bc, BANK(Frames), 6 ; "┌" to "┘"
 	call Get1bpp_2
 	ld hl, vTiles2 tile " " ; $7f
-	ld de, TextBoxSpaceGFX
-	lb bc, BANK(TextBoxSpaceGFX), 1
+	ld de, TextboxSpaceGFX
+	lb bc, BANK(TextboxSpaceGFX), 1
 	call Get1bpp_2
 	ret
 

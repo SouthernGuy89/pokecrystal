@@ -204,20 +204,20 @@ EvolveAfterBattle_MasterLoop:
 	ld hl, wPartyMonNicknames
 	call GetNick
 	call CopyName1
-	ld hl, Text_WhatEvolving
+	ld hl, EvolvingText
 	call PrintText
 
 	ld c, 50
 	call DelayFrames
 
 	xor a
-	ld [hBGMapMode], a
+	ldh [hBGMapMode], a
 	hlcoord 0, 0
 	lb bc, 12, 20
 	call ClearBox
 
 	ld a, $1
-	ld [hBGMapMode], a
+	ldh [hBGMapMode], a
 	call ClearSprites
 
 	farcall EvolutionAnimation
@@ -227,7 +227,7 @@ EvolveAfterBattle_MasterLoop:
 	pop af
 	jp c, CancelEvolution
 
-	ld hl, Text_CongratulationsYourPokemon
+	ld hl, CongratulationsYourPokemonText
 	call PrintText
 
 	pop hl
@@ -240,8 +240,8 @@ EvolveAfterBattle_MasterLoop:
 	call GetPokemonName
 
 	push hl
-	ld hl, Text_EvolvedIntoPKMN
-	call PrintTextBoxText
+	ld hl, EvolvedIntoText
+	call PrintTextboxText
 	farcall StubbedTrainerRankings_MonsEvolved
 
 	ld de, MUSIC_NONE
@@ -377,7 +377,7 @@ UpdateSpeciesNameIfNotNicknamed:
 	jp CopyBytes
 
 CancelEvolution:
-	ld hl, Text_StoppedEvolving
+	ld hl, StoppedEvolvingText
 	call PrintText
 	call ClearTileMap
 	pop hl
@@ -394,25 +394,21 @@ IsMonHoldingEverstone:
 	pop hl
 	ret
 
-Text_CongratulationsYourPokemon:
-	; Congratulations! Your @ @
-	text_jump UnknownText_0x1c4b92
-	db "@"
+CongratulationsYourPokemonText:
+	text_far _CongratulationsYourPokemonText
+	text_end
 
-Text_EvolvedIntoPKMN:
-	; evolved into @ !
-	text_jump UnknownText_0x1c4baf
-	db "@"
+EvolvedIntoText:
+	text_far _EvolvedIntoText
+	text_end
 
-Text_StoppedEvolving:
-	; Huh? @ stopped evolving!
-	text_jump UnknownText_0x1c4bc5
-	db "@"
+StoppedEvolvingText:
+	text_far _StoppedEvolvingText
+	text_end
 
-Text_WhatEvolving:
-	; What? @ is evolving!
-	text_jump UnknownText_0x1c4be3
-	db "@"
+EvolvingText:
+	text_far _EvolvingText
+	text_end
 
 LearnLevelMoves:
 	ld a, [wTempSpecies]

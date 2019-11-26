@@ -150,7 +150,7 @@ MainMenu_GetWhichMenu:
 	ret
 
 .next
-	ld a, [hCGB]
+	ldh a, [hCGB]
 	cp $1
 	ld a, $1
 	ret nz
@@ -217,7 +217,7 @@ MainMenu_PrintCurrentTimeAndDay:
 	and a
 	ret z
 	xor a
-	ld [hBGMapMode], a
+	ldh [hBGMapMode], a
 	call .PlaceBox
 	ld hl, wOptions
 	ld a, [hl]
@@ -227,7 +227,7 @@ MainMenu_PrintCurrentTimeAndDay:
 	pop af
 	ld [wOptions], a
 	ld a, $1
-	ld [hBGMapMode], a
+	ldh [hBGMapMode], a
 	ret
 
 .PlaceBox:
@@ -237,11 +237,11 @@ MainMenu_PrintCurrentTimeAndDay:
 	hlcoord 0, 14
 	ld b, 2
 	ld c, 18
-	call TextBox
+	call Textbox
 	ret
 
 .TimeFail:
-	call SpeechTextBox
+	call SpeechTextbox
 	ret
 
 .PlaceTime:
@@ -257,7 +257,7 @@ MainMenu_PrintCurrentTimeAndDay:
 	decoord 1, 15
 	call .PlaceCurrentDay
 	decoord 4, 16
-	ld a, [hHours]
+	ldh a, [hHours]
 	ld c, a
 	farcall PrintHour
 	ld [hl], ":"
@@ -280,10 +280,9 @@ MainMenu_PrintCurrentTimeAndDay:
 .TimeNotSet:
 	db "TIME NOT SET@"
 
-.UnusedText:
-	; Clock time unknown
-	text_jump UnknownText_0x1c5182
-	db "@"
+.MainMenuTimeUnknownText:
+	text_far _MainMenuTimeUnknownText
+	text_end
 
 .PlaceCurrentDay:
 	push de
@@ -313,7 +312,7 @@ MainMenu_PrintCurrentTimeAndDay:
 
 Function49ed0:
 	xor a
-	ld [hMapAnims], a
+	ldh [hMapAnims], a
 	call ClearTileMap
 	call LoadFontsExtra
 	call LoadStandardFont

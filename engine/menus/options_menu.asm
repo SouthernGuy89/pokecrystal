@@ -7,7 +7,7 @@ _OptionsMenu:
 	hlcoord 0, 0
 	ld b, 16
 	ld c, 18
-	call TextBox
+	call Textbox
 	hlcoord 2, 2
 	ld de, StringOptions
 	call PlaceString
@@ -18,7 +18,7 @@ _OptionsMenu:
 .print_text_loop ; this next will display the settings of each option when the menu is opened
 	push bc
 	xor a
-	ld [hJoyLast], a
+	ldh [hJoyLast], a
 	call GetOptionPointer
 	pop bc
 	ld hl, wJumptableIndex
@@ -30,7 +30,7 @@ _OptionsMenu:
 	xor a
 	ld [wJumptableIndex], a
 	inc a
-	ld [hBGMapMode], a
+	ldh [hBGMapMode], a
 	call WaitBGMap
 	ld b, SCGB_DIPLOMA
 	call GetSGBLayout
@@ -38,7 +38,7 @@ _OptionsMenu:
 
 .joypad_loop
 	call JoyTextDelay
-	ld a, [hJoyPressed]
+	ldh a, [hJoyPressed]
 	and START | B_BUTTON
 	jr nz, .ExitOptions
 	call OptionsControl
@@ -57,7 +57,7 @@ _OptionsMenu:
 	call PlaySFX
 	call WaitSFX
 	pop af
-	ld [hInMenu], a
+	ldh [hInMenu], a
 	ret
 
 StringOptions:
@@ -106,7 +106,7 @@ GetOptionPointer:
 
 Options_TextSpeed:
 	call GetTextSpeed
-	ld a, [hJoyPressed]
+	ldh a, [hJoyPressed]
 	bit D_LEFT_F, a
 	jr nz, .LeftPressed
 	bit D_RIGHT_F, a
@@ -187,7 +187,7 @@ GetTextSpeed:
 
 Options_BattleScene:
 	ld hl, wOptions
-	ld a, [hJoyPressed]
+	ldh a, [hJoyPressed]
 	bit D_LEFT_F, a
 	jr nz, .LeftPressed
 	bit D_RIGHT_F, a
@@ -226,7 +226,7 @@ Options_BattleScene:
 
 Options_BattleStyle:
 	ld hl, wOptions
-	ld a, [hJoyPressed]
+	ldh a, [hJoyPressed]
 	bit D_LEFT_F, a
 	jr nz, .LeftPressed
 	bit D_RIGHT_F, a
@@ -264,7 +264,7 @@ Options_BattleStyle:
 
 Options_Sound:
 	ld hl, wOptions
-	ld a, [hJoyPressed]
+	ldh a, [hJoyPressed]
 	bit D_LEFT_F, a
 	jr nz, .LeftPressed
 	bit D_RIGHT_F, a
@@ -316,7 +316,7 @@ Options_Sound:
 
 Options_Print:
 	call GetPrinterSetting
-	ld a, [hJoyPressed]
+	ldh a, [hJoyPressed]
 	bit D_LEFT_F, a
 	jr nz, .LeftPressed
 	bit D_RIGHT_F, a
@@ -343,7 +343,7 @@ Options_Print:
 
 .Save:
 	ld b, a
-	ld [wGBPrinter], a
+	ld [wGBPrinterBrightness], a
 
 .NonePressed:
 	ld b, $0
@@ -375,7 +375,7 @@ Options_Print:
 GetPrinterSetting:
 ; converts GBPRINTER_* value in a to OPT_PRINT_* value in c,
 ; with previous/next GBPRINTER_* values in d/e
-	ld a, [wGBPrinter]
+	ld a, [wGBPrinterBrightness]
 	and a
 	jr z, .IsLightest
 	cp GBPRINTER_LIGHTER
@@ -411,7 +411,7 @@ GetPrinterSetting:
 
 Options_MenuAccount:
 	ld hl, wOptions2
-	ld a, [hJoyPressed]
+	ldh a, [hJoyPressed]
 	bit D_LEFT_F, a
 	jr nz, .LeftPressed
 	bit D_RIGHT_F, a
@@ -448,8 +448,8 @@ Options_MenuAccount:
 .On:  db "ON @"
 
 Options_Frame:
-	ld hl, wTextBoxFrame
-	ld a, [hJoyPressed]
+	ld hl, wTextboxFrame
+	ldh a, [hJoyPressed]
 	bit D_LEFT_F, a
 	jr nz, .LeftPressed
 	bit D_RIGHT_F, a
@@ -470,7 +470,7 @@ Options_Frame:
 	maskbits NUM_FRAMES
 	ld [hl], a
 UpdateFrame:
-	ld a, [wTextBoxFrame]
+	ld a, [wTextboxFrame]
 	hlcoord 16, 15 ; where on the screen the number is drawn
 	add "1"
 	ld [hl], a
@@ -479,7 +479,7 @@ UpdateFrame:
 	ret
 
 Options_Cancel:
-	ld a, [hJoyPressed]
+	ldh a, [hJoyPressed]
 	and A_BUTTON
 	jr nz, .Exit
 	and a
@@ -491,7 +491,7 @@ Options_Cancel:
 
 OptionsControl:
 	ld hl, wJumptableIndex
-	ld a, [hJoyLast]
+	ldh a, [hJoyLast]
 	cp D_DOWN
 	jr z, .DownPressed
 	cp D_UP

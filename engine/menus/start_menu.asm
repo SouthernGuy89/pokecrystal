@@ -78,13 +78,13 @@ StartMenu::
 	dw .ReturnRedraw
 
 .Exit:
-	ld a, [hOAMUpdate]
+	ldh a, [hOAMUpdate]
 	push af
 	ld a, 1
-	ld [hOAMUpdate], a
+	ldh [hOAMUpdate], a
 	call LoadFontsExtra
 	pop af
-	ld [hOAMUpdate], a
+	ldh [hOAMUpdate], a
 .ReturnEnd:
 	call ExitMenu
 .ReturnEnd2:
@@ -95,7 +95,7 @@ StartMenu::
 .GetInput:
 ; Return carry on exit, and no-carry on selection.
 	xor a
-	ld [hBGMapMode], a
+	ldh [hBGMapMode], a
 	call ._DrawMenuAccount
 	call SetUpMenu
 	ld a, $ff
@@ -120,13 +120,13 @@ StartMenu::
 .ExitMenuRunScript:
 	call ExitMenu
 	ld a, HMENURETURN_SCRIPT
-	ld [hMenuReturn], a
+	ldh [hMenuReturn], a
 	ret
 
 .ExitMenuRunScriptCloseText:
 	call ExitMenu
 	ld a, HMENURETURN_SCRIPT
-	ld [hMenuReturn], a
+	ldh [hMenuReturn], a
 	jr .ReturnEnd2
 
 .ExitMenuCallFuncCloseText:
@@ -379,7 +379,7 @@ endr
 	hlcoord 0, 13
 	ld b, 3
 	ld c, 8
-	jp TextBoxPalette
+	jp TextboxPalette
 
 .IsMenuAccountOn:
 	ld a, [wOptions2]
@@ -411,7 +411,7 @@ StartMenu_Exit:
 StartMenu_Quit:
 ; Retire from the bug catching contest.
 
-	ld hl, .EndTheContestText
+	ld hl, .StartMenuContestEndText
 	call StartMenuYesNo
 	jr c, .DontEndContest
 	ld a, BANK(BugCatchingContestReturnToGateScript)
@@ -424,9 +424,9 @@ StartMenu_Quit:
 	ld a, 0
 	ret
 
-.EndTheContestText:
-	text_jump UnknownText_0x1c1a6c
-	db "@"
+.StartMenuContestEndText:
+	text_far _StartMenuContestEndText
+	text_end
 
 StartMenu_Save:
 ; Save the game.

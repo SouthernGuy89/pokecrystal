@@ -1,4 +1,4 @@
-	const_def 2 ; object constants
+	object_const_def ; object_event constants
 	const FASTSHIP1F_SAILOR1
 	const FASTSHIP1F_SAILOR2
 	const FASTSHIP1F_SAILOR3
@@ -16,7 +16,7 @@ FastShip1F_MapScripts:
 	end
 
 .EnterFastShip:
-	priorityjump .EnterFastShipScript
+	prioritysjump .EnterFastShipScript
 	end
 
 .DummyScene2:
@@ -87,7 +87,7 @@ FastShip1FSailor1Script:
 	end
 
 .LetThePlayerOut:
-	checkcode VAR_FACING
+	readvar VAR_FACING
 	ifequal RIGHT, .YouAreFacingRight
 	applymovement FASTSHIP1F_SAILOR1, MovementData_0x7520e
 	applymovement PLAYER, MovementData_0x75235
@@ -127,7 +127,7 @@ WorriedGrandpaSceneLeft:
 	applymovement PLAYER, MovementData_0x7522e
 	applymovement FASTSHIP1F_GENTLEMAN, MovementData_0x75220
 	opentext
-	writetext UnknownText_0x75412
+	writetext FastShip1FGrandpaText
 	waitbutton
 	closetext
 	turnobject PLAYER, RIGHT
@@ -257,7 +257,7 @@ FastShip1FSailor3Text:
 	cont "their cabins."
 	done
 
-UnknownText_0x75412:
+FastShip1FGrandpaText:
 	text "Whoa! Excuse me."
 	line "I was in a hurry!"
 

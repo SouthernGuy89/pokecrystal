@@ -28,14 +28,14 @@ _DummyGame:
 	xor a
 	call ByteFill
 	xor a
-	ld [hSCY], a
-	ld [hSCX], a
-	ld [rWY], a
+	ldh [hSCY], a
+	ldh [hSCX], a
+	ldh [rWY], a
 	ld [wJumptableIndex], a
 	ld a, $1
-	ld [hBGMapMode], a
+	ldh [hBGMapMode], a
 	ld a, LCDC_DEFAULT
-	ld [rLCDC], a
+	ldh [rLCDC], a
 	ld a, $e4
 	call DmgToCgbBGPals
 	ld a, $e0
@@ -200,7 +200,7 @@ endr
 	ret
 
 .RevealAll:
-	ld a, [hJoypadPressed]
+	ldh a, [hJoypadPressed]
 	and A_BUTTON
 	ret z
 	xor a
@@ -304,31 +304,29 @@ DummyGame_CheckMatch:
 	call DummyGame_Card2Coord
 	call DummyGame_PlaceCard
 
-	ld hl, DummyGameText_Darn
+	ld hl, DummyGameDarnText
 	call PrintText
 	ret
 
 .VictoryText:
-	start_asm
+	text_asm
 	push bc
 	hlcoord 2, 13
 	call DummyGame_PlaceCard
-	ld hl, DummyGameText_Yeah
+	ld hl, DummyGameYeahText
 	pop bc
 	inc bc
 	inc bc
 	inc bc
 	ret
 
-DummyGameText_Yeah:
-	; , yeah!
-	text_jump UnknownText_0x1c1a5b
-	db "@"
+DummyGameYeahText:
+	text_far _DummyGameYeahText
+	text_end
 
-DummyGameText_Darn:
-	; Darn…
-	text_jump UnknownText_0x1c1a65
-	db "@"
+DummyGameDarnText:
+	text_far _DummyGameDarnText
+	text_end
 
 DummyGame_InitBoard:
 	ld hl, wDummyGameCards
@@ -500,7 +498,7 @@ DummyGame_InterpretJoypad_AnimateCursor:
 	cp $7
 	jr nc, .quit
 	call JoyTextDelay
-	ld hl, hJoypadPressed ; $ffa3
+	ld hl, hJoypadPressed
 	ld a, [hl]
 	and A_BUTTON
 	jr nz, .pressed_a

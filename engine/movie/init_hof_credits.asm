@@ -14,19 +14,18 @@ InitDisplayForHallOfFame:
 	xor a
 	call ByteFill
 	xor a
-	ld [hSCY], a
-	ld [hSCX], a
+	ldh [hSCY], a
+	ldh [hSCX], a
 	call EnableLCD
-	ld hl, .SavingRecordDontTurnOff
+	ld hl, .SavingRecordText
 	call PrintText
 	call WaitBGMap2
 	call SetPalettes
 	ret
 
-.SavingRecordDontTurnOff:
-	; SAVING RECORD… DON'T TURN OFF!
-	text_jump UnknownText_0x1bd39e
-	db "@"
+.SavingRecordText:
+	text_far _SavingRecordText
+	text_end
 
 InitDisplayForRedCredits:
 	call ClearBGPalettes
@@ -53,18 +52,18 @@ InitDisplayForRedCredits:
 	dec c
 	jr nz, .load_white_palettes
 	xor a
-	ld [hSCY], a
-	ld [hSCX], a
+	ldh [hSCY], a
+	ldh [hSCX], a
 	call EnableLCD
 	call WaitBGMap2
 	call SetPalettes
 	ret
 
 ResetDisplayBetweenHallOfFameMons:
-	ld a, [rSVBK]
+	ldh a, [rSVBK]
 	push af
 	ld a, BANK(wDecompressScratch)
-	ld [rSVBK], a
+	ldh [rSVBK], a
 	ld hl, wDecompressScratch
 	ld bc, wScratchAttrMap - wDecompressScratch
 	ld a, " "
@@ -75,5 +74,5 @@ ResetDisplayBetweenHallOfFameMons:
 	ld c, 4 tiles
 	call Request2bpp
 	pop af
-	ld [rSVBK], a
+	ldh [rSVBK], a
 	ret

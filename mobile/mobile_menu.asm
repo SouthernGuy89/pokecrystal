@@ -23,7 +23,7 @@ Function49f16:
 	hlcoord 0, 12
 	ld b, 4
 	ld c, SCREEN_HEIGHT
-	call TextBox
+	call Textbox
 	xor a
 	ld de, String_0x49fe9
 	hlcoord 1, 14
@@ -258,7 +258,7 @@ Function4a149:
 	hlcoord 0, 12
 	ld b, $4
 	ld c, $12
-	call TextBox
+	call Textbox
 	ld a, [wMenuCursorY]
 	dec a
 	ld hl, Strings_4a23d
@@ -413,12 +413,12 @@ Function4a28a:
 
 .DeleteLoginPassword:
 	call PlaceHollowCursor
-	ld hl, UnknownText_0x4a358
+	ld hl, DeleteSavedLoginPasswordText
 	call PrintText
 	hlcoord 14, 7
 	ld b, 3
 	ld c, 4
-	call TextBox
+	call Textbox
 	farcall Mobile_OpenAndCloseMenu_HDMATransferTileMapAndAttrMap
 	ld hl, DeletePassword_YesNo_MenuHeader
 	call LoadMenuHeader
@@ -435,7 +435,7 @@ Function4a28a:
 	ld bc, MOBILE_LOGIN_PASSWORD_LENGTH
 	call ByteFill
 	call CloseSRAM
-	ld hl, UnknownText_0x4a35d
+	ld hl, DeletedTheLoginPasswordText
 	call PrintText
 	call JoyWaitAorB
 .dont_delete_password
@@ -455,15 +455,13 @@ String_4a34b:
 	next "けす"
 	next "もどる@"
 
-UnknownText_0x4a358:
-	; Delete the saved LOG-IN PASSWORD?
-	text_jump UnknownText_0x1c5196
-	db "@"
+DeleteSavedLoginPasswordText:
+	text_far _DeleteSavedLoginPasswordText
+	text_end
 
-UnknownText_0x4a35d:
-	; Deleted the LOG-IN PASSWORD.
-	text_jump UnknownText_0x1c51b9
-	db "@"
+DeletedTheLoginPasswordText:
+	text_far _DeletedTheLoginPasswordText
+	text_end
 
 DeletePassword_YesNo_MenuHeader:
 	db MENU_BACKUP_TILES ; flags
@@ -667,7 +665,7 @@ Function4a4c4:
 	hlcoord 0, 12
 	ld b, $4
 	ld c, $12
-	call TextBox
+	call Textbox
 	xor a
 	ld hl, Strings_4a5f6
 	ld d, h

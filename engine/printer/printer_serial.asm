@@ -4,13 +4,13 @@ Printer_StartTransmission:
 	xor a
 	call Printer_ByteFill
 	xor a
-	ld [rSB], a
-	ld [rSC], a
+	ldh [rSB], a
+	ldh [rSC], a
 	ld [wPrinterOpcode], a
 	ld hl, wPrinterConnectionOpen
 	set 0, [hl]
-	ld a, [wGBPrinter]
-	ld [wGBPrinterSettings], a
+	ld a, [wGBPrinterBrightness]
+	ld [wPrinterExposureTime], a
 	xor a
 	ld [wJumptableIndex], a
 	ret
@@ -278,11 +278,11 @@ Printer_WaitHandshake:
 	ld a, $1
 	ld [wPrinterOpcode], a
 	ld a, $88
-	ld [rSB], a
-	ld a, $1
-	ld [rSC], a
-	ld a, $81
-	ld [rSC], a
+	ldh [rSB], a
+	ld a, (0 << rSC_ON) | (1 << rSC_CLOCK)
+	ldh [rSC], a
+	ld a, (1 << rSC_ON) | (1 << rSC_CLOCK)
+	ldh [rSC], a
 	ret
 
 Printer_CopyPacket:
@@ -353,11 +353,11 @@ Printer_ComputeChecksum:
 Printer_StageHeaderForSend:
 	ld a, $1
 	ld [wGameboyPrinter2bppSource + 0], a
-	ld a, [wcbfa]
+	ld a, [wPrinterMargins]
 	ld [wGameboyPrinter2bppSource + 1], a
-	ld a, %11100100
+	ld a, %11100100 ; 3,2,1,0
 	ld [wGameboyPrinter2bppSource + 2], a
-	ld a, [wGBPrinterSettings]
+	ld a, [wPrinterExposureTime]
 	ld [wGameboyPrinter2bppSource + 3], a
 	ret
 
@@ -588,7 +588,7 @@ Printer_Send0x00_2:
 	ret
 
 Printer_ReceiveTwoPrinterHandshakeAndSend0x00:
-	ld a, [rSB]
+	ldh a, [rSB]
 	ld [wPrinterHandshake], a
 	ld a, $0
 	call Printer_SerialSend
@@ -596,7 +596,7 @@ Printer_ReceiveTwoPrinterHandshakeAndSend0x00:
 	ret
 
 Printer_ReceiveTwoPrinterStatusFlagsAndExitSendLoop:
-	ld a, [rSB]
+	ldh a, [rSB]
 	ld [wPrinterStatusFlags], a
 	xor a
 	ld [wPrinterOpcode], a
@@ -621,16 +621,16 @@ Printer_Send0x08:
 	ret
 
 Printer_SerialSend:
-	ld [rSB], a
-	ld a, $1 ; switch to internal clock
-	ld [rSC], a
-	ld a, $81 ; start transfer
-	ld [rSC], a
+	ldh [rSB], a
+	ld a, (0 << rSC_ON) | (1 << rSC_CLOCK)
+	ldh [rSC], a
+	ld a, (1 << rSC_ON) | (1 << rSC_CLOCK)
+	ldh [rSC], a
 	ret
 
 Printer_ReceiveTwoPrinterStatusFlagsAndExitSendLoop_2:
 ; identical to Printer_ReceiveTwoPrinterStatusFlagsAndExitSendLoop, but referenced less
-	ld a, [rSB]
+	ldh a, [rSB]
 	ld [wPrinterStatusFlags], a
 	xor a
 	ld [wPrinterOpcode], a

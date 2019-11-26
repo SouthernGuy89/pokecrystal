@@ -15,7 +15,7 @@ DoEnemyTurn:
 	jr z, DoTurn
 
 	ld a, [wBattleAction]
-	cp BATTLEACTION_E
+	cp BATTLEACTION_STRUGGLE
 	jr z, DoTurn
 	cp BATTLEACTION_SWITCH1
 	ret nc
@@ -130,7 +130,7 @@ BattleCommand_CheckTurn:
 	ld a, EFFECTIVE
 	ld [wTypeModifier], a
 
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jp nz, CheckEnemyTurn
 
@@ -141,7 +141,7 @@ CheckPlayerTurn:
 
 	res SUBSTATUS_RECHARGE, [hl]
 	ld hl, MustRechargeText
-	call StdBattleTextBox
+	call StdBattleTextbox
 	call CantMove
 	jp EndTurn
 
@@ -165,20 +165,20 @@ CheckPlayerTurn:
 
 .woke_up
 	ld hl, WokeUpText
-	call StdBattleTextBox
+	call StdBattleTextbox
 	call CantMove
 	call UpdateBattleMonInParty
 	ld hl, UpdatePlayerHUD
 	call CallBattleCore
 	ld a, $1
-	ld [hBGMapMode], a
+	ldh [hBGMapMode], a
 	ld hl, wPlayerSubStatus1
 	res SUBSTATUS_NIGHTMARE, [hl]
 	jr .not_asleep
 
 .fast_asleep
 	ld hl, FastAsleepText
-	call StdBattleTextBox
+	call StdBattleTextbox
 
 	; Snore and Sleep Talk bypass sleep.
 	ld a, [wCurPlayerMove]
@@ -204,7 +204,7 @@ CheckPlayerTurn:
 	jr z, .not_frozen
 
 	ld hl, FrozenSolidText
-	call StdBattleTextBox
+	call StdBattleTextbox
 
 	call CantMove
 	jp EndTurn
@@ -217,7 +217,7 @@ CheckPlayerTurn:
 
 	res SUBSTATUS_FLINCHED, [hl]
 	ld hl, FlinchedText
-	call StdBattleTextBox
+	call StdBattleTextbox
 
 	call CantMove
 	jp EndTurn
@@ -237,7 +237,7 @@ CheckPlayerTurn:
 	ld [hl], a
 	ld [wDisabledMove], a
 	ld hl, DisabledNoMoreText
-	call StdBattleTextBox
+	call StdBattleTextbox
 
 .not_disabled
 
@@ -251,12 +251,12 @@ CheckPlayerTurn:
 	ld hl, wPlayerSubStatus3
 	res SUBSTATUS_CONFUSED, [hl]
 	ld hl, ConfusedNoMoreText
-	call StdBattleTextBox
+	call StdBattleTextbox
 	jr .not_confused
 
 .confused
 	ld hl, IsConfusedText
-	call StdBattleTextBox
+	call StdBattleTextbox
 	xor a
 	ld [wNumHits], a
 	ld de, ANIM_CONFUSED
@@ -284,7 +284,7 @@ CheckPlayerTurn:
 	jr nc, .not_infatuated
 
 	ld hl, InLoveWithText
-	call StdBattleTextBox
+	call StdBattleTextbox
 	xor a
 	ld [wNumHits], a
 	ld de, ANIM_IN_LOVE
@@ -296,7 +296,7 @@ CheckPlayerTurn:
 	jr c, .not_infatuated
 
 	ld hl, InfatuationText
-	call StdBattleTextBox
+	call StdBattleTextbox
 	call CantMove
 	jp EndTurn
 
@@ -328,7 +328,7 @@ CheckPlayerTurn:
 	ret nc
 
 	ld hl, FullyParalyzedText
-	call StdBattleTextBox
+	call StdBattleTextbox
 	call CantMove
 	jp EndTurn
 
@@ -370,7 +370,7 @@ CheckEnemyTurn:
 
 	res SUBSTATUS_RECHARGE, [hl]
 	ld hl, MustRechargeText
-	call StdBattleTextBox
+	call StdBattleTextbox
 	call CantMove
 	jp EndTurn
 
@@ -387,7 +387,7 @@ CheckEnemyTurn:
 	jr z, .woke_up
 
 	ld hl, FastAsleepText
-	call StdBattleTextBox
+	call StdBattleTextbox
 	xor a
 	ld [wNumHits], a
 	ld de, ANIM_SLP
@@ -396,13 +396,13 @@ CheckEnemyTurn:
 
 .woke_up
 	ld hl, WokeUpText
-	call StdBattleTextBox
+	call StdBattleTextbox
 	call CantMove
 	call UpdateEnemyMonInParty
 	ld hl, UpdateEnemyHUD
 	call CallBattleCore
 	ld a, $1
-	ld [hBGMapMode], a
+	ldh [hBGMapMode], a
 	ld hl, wEnemySubStatus1
 	res SUBSTATUS_NIGHTMARE, [hl]
 	jr .not_asleep
@@ -431,7 +431,7 @@ CheckEnemyTurn:
 	jr z, .not_frozen
 
 	ld hl, FrozenSolidText
-	call StdBattleTextBox
+	call StdBattleTextbox
 	call CantMove
 	jp EndTurn
 
@@ -443,7 +443,7 @@ CheckEnemyTurn:
 
 	res SUBSTATUS_FLINCHED, [hl]
 	ld hl, FlinchedText
-	call StdBattleTextBox
+	call StdBattleTextbox
 
 	call CantMove
 	jp EndTurn
@@ -464,7 +464,7 @@ CheckEnemyTurn:
 	ld [wEnemyDisabledMove], a
 
 	ld hl, DisabledNoMoreText
-	call StdBattleTextBox
+	call StdBattleTextbox
 
 .not_disabled
 
@@ -479,12 +479,12 @@ CheckEnemyTurn:
 	ld hl, wEnemySubStatus3
 	res SUBSTATUS_CONFUSED, [hl]
 	ld hl, ConfusedNoMoreText
-	call StdBattleTextBox
+	call StdBattleTextbox
 	jr .not_confused
 
 .confused
 	ld hl, IsConfusedText
-	call StdBattleTextBox
+	call StdBattleTextbox
 
 	xor a
 	ld [wNumHits], a
@@ -503,10 +503,12 @@ CheckEnemyTurn:
 	ld [hl], a
 
 	ld hl, HurtItselfText
-	call StdBattleTextBox
+	call StdBattleTextbox
+
 	call HitSelfInConfusion
 	call BattleCommand_DamageCalc
 	call BattleCommand_LowerSub
+
 	xor a
 	ld [wNumHits], a
 
@@ -530,7 +532,7 @@ CheckEnemyTurn:
 	jr nc, .not_infatuated
 
 	ld hl, InLoveWithText
-	call StdBattleTextBox
+	call StdBattleTextbox
 	xor a
 	ld [wNumHits], a
 	ld de, ANIM_IN_LOVE
@@ -542,7 +544,7 @@ CheckEnemyTurn:
 	jr c, .not_infatuated
 
 	ld hl, InfatuationText
-	call StdBattleTextBox
+	call StdBattleTextbox
 	call CantMove
 	jp EndTurn
 
@@ -575,7 +577,7 @@ CheckEnemyTurn:
 	ret nc
 
 	ld hl, FullyParalyzedText
-	call StdBattleTextBox
+	call StdBattleTextbox
 	call CantMove
 
 	; fallthrough
@@ -597,11 +599,11 @@ MoveDisabled:
 	call GetMoveName
 
 	ld hl, DisabledMoveText
-	jp StdBattleTextBox
+	jp StdBattleTextbox
 
 HitConfusion:
 	ld hl, HurtItselfText
-	call StdBattleTextBox
+	call StdBattleTextbox
 
 	xor a
 	ld [wCriticalHit], a
@@ -623,7 +625,7 @@ HitConfusion:
 	ld hl, UpdatePlayerHUD
 	call CallBattleCore
 	ld a, $1
-	ld [hBGMapMode], a
+	ldh [hBGMapMode], a
 	ld c, TRUE
 	call DoPlayerDamage
 	jp BattleCommand_RaiseSub
@@ -632,7 +634,7 @@ BattleCommand_CheckObedience:
 ; checkobedience
 
 	; Enemy can't disobey
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	ret nz
 
@@ -766,7 +768,7 @@ BattleCommand_CheckObedience:
 	jr nc, .DoNothing
 
 	ld hl, WontObeyText
-	call StdBattleTextBox
+	call StdBattleTextbox
 	call HitConfusion
 	jp .EndDisobedience
 
@@ -802,7 +804,7 @@ BattleCommand_CheckObedience:
 	ld hl, IgnoredOrdersText
 
 .Print:
-	call StdBattleTextBox
+	call StdBattleTextbox
 	jp .EndDisobedience
 
 .UseInstead:
@@ -932,7 +934,7 @@ IgnoreSleepOnly:
 
 ; 'ignored orders…sleeping!'
 	ld hl, IgnoredSleepingText
-	call StdBattleTextBox
+	call StdBattleTextbox
 
 	call EndMoveEffect
 
@@ -945,7 +947,7 @@ BattleCommand_UsedMoveText:
 	ret
 
 CheckUserIsCharging:
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	ld a, [wPlayerCharging] ; player
 	jr z, .end
@@ -962,7 +964,7 @@ BattleCommand_DoTurn:
 	ld de, wPlayerSubStatus3
 	ld bc, wPlayerTurnsTaken
 
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .proceed
 
@@ -999,7 +1001,7 @@ BattleCommand_DoTurn:
 	bit SUBSTATUS_TRANSFORMED, a
 	ret nz
 
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 
 	ld hl, wPartyMon1PP
@@ -1022,7 +1024,7 @@ BattleCommand_DoTurn:
 	ret c
 
 .consume_pp
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	ld a, [wCurMoveNum]
 	jr z, .okay
@@ -1075,7 +1077,7 @@ BattleCommand_DoTurn:
 ; 'but no pp is left for the move'
 	ld hl, NoPPLeftText
 .print
-	call StdBattleTextBox
+	call StdBattleTextbox
 	ld b, 1
 	ret
 
@@ -1091,7 +1093,7 @@ BattleCommand_DoTurn:
 	db -1
 
 CheckMimicUsed:
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	ld a, [wCurMoveNum]
 	jr z, .player
@@ -1133,7 +1135,7 @@ BattleCommand_Critical:
 	and a
 	ret z
 
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	ld hl, wEnemyMonItem
 	ld a, [wEnemyMonSpecies]
@@ -1232,7 +1234,7 @@ BattleCommand_Stab:
 	ld d, a
 	ld e, [hl]
 
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .go ; Who Attacks and who Defends
 
@@ -1339,48 +1341,48 @@ BattleCommand_Stab:
 	ld [wAttackMissed], a
 	xor a
 .NotImmune:
-	ld [hMultiplier], a
+	ldh [hMultiplier], a
 	add b
 	ld [wTypeModifier], a
 
 	xor a
-	ld [hMultiplicand + 0], a
+	ldh [hMultiplicand + 0], a
 
 	ld hl, wCurDamage
 	ld a, [hli]
-	ld [hMultiplicand + 1], a
+	ldh [hMultiplicand + 1], a
 	ld a, [hld]
-	ld [hMultiplicand + 2], a
+	ldh [hMultiplicand + 2], a
 
 	call Multiply
 
-	ld a, [hProduct + 1]
+	ldh a, [hProduct + 1]
 	ld b, a
-	ld a, [hProduct + 2]
+	ldh a, [hProduct + 2]
 	or b
 	ld b, a
-	ld a, [hProduct + 3]
+	ldh a, [hProduct + 3]
 	or b
 	jr z, .ok ; This is a very convoluted way to get back that we've essentially dealt no damage.
 
 ; Take the product and divide it by 10.
 	ld a, 10
-	ld [hDivisor], a
+	ldh [hDivisor], a
 	ld b, 4
 	call Divide
-	ld a, [hQuotient + 1]
+	ldh a, [hQuotient + 2]
 	ld b, a
-	ld a, [hQuotient + 2]
+	ldh a, [hQuotient + 3]
 	or b
 	jr nz, .ok
 
 	ld a, 1
-	ld [hMultiplicand + 2], a
+	ldh [hMultiplicand + 2], a
 
 .ok
-	ld a, [hMultiplicand + 1]
+	ldh a, [hMultiplicand + 1]
 	ld [hli], a
-	ld a, [hMultiplicand + 2]
+	ldh a, [hMultiplicand + 2]
 	ld [hl], a
 	pop bc
 	pop hl
@@ -1402,7 +1404,7 @@ BattleCommand_Stab:
 
 BattleCheckTypeMatchup:
 	ld hl, wEnemyMonType1
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, CheckTypeMatchup
 	ld hl, wBattleMonType1
@@ -1455,21 +1457,21 @@ CheckTypeMatchup:
 
 .Yup:
 	xor a
-	ld [hDividend + 0], a
-	ld [hMultiplicand + 0], a
-	ld [hMultiplicand + 1], a
+	ldh [hDividend + 0], a
+	ldh [hMultiplicand + 0], a
+	ldh [hMultiplicand + 1], a
 	ld a, [hli]
-	ld [hMultiplicand + 2], a
+	ldh [hMultiplicand + 2], a
 	ld a, [wTypeMatchup]
-	ld [hMultiplier], a
+	ldh [hMultiplier], a
 	call Multiply
 	ld a, 10
-	ld [hDivisor], a
+	ldh [hDivisor], a
 	push bc
 	ld b, 4
 	call Divide
 	pop bc
-	ld a, [hQuotient + 2]
+	ldh a, [hQuotient + 3]
 	ld [wTypeMatchup], a
 	jr .TypesLoop
 
@@ -1523,12 +1525,12 @@ BattleCommand_DamageVariation:
 .go
 ; Start with the maximum damage.
 	xor a
-	ld [hMultiplicand + 0], a
+	ldh [hMultiplicand + 0], a
 	dec hl
 	ld a, [hli]
-	ld [hMultiplicand + 1], a
+	ldh [hMultiplicand + 1], a
 	ld a, [hl]
-	ld [hMultiplicand + 2], a
+	ldh [hMultiplicand + 2], a
 
 ; Multiply by 85-100%...
 .loop
@@ -1537,20 +1539,20 @@ BattleCommand_DamageVariation:
 	cp 85 percent + 1
 	jr c, .loop
 
-	ld [hMultiplier], a
+	ldh [hMultiplier], a
 	call Multiply
 
 ; ...divide by 100%...
 	ld a, $ff ; 100%
-	ld [hDivisor], a
+	ldh [hDivisor], a
 	ld b, $4
 	call Divide
 
 ; ...to get .85-1.00x damage.
-	ld a, [hQuotient + 1]
+	ldh a, [hQuotient + 2]
 	ld hl, wCurDamage
 	ld [hli], a
-	ld a, [hQuotient + 2]
+	ldh a, [hQuotient + 3]
 	ld [hl], a
 	ret
 
@@ -1588,7 +1590,7 @@ BattleCommand_CheckHit:
 
 	ld a, [wPlayerMoveStruct + MOVE_ACC]
 	ld b, a
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .BrightPowder
 	ld a, [wEnemyMoveStruct + MOVE_ACC]
@@ -1660,7 +1662,7 @@ BattleCommand_CheckHit:
 
 ; 'protecting itself!'
 	ld hl, ProtectingItselfText
-	call StdBattleTextBox
+	call StdBattleTextbox
 
 	ld c, 40
 	call DelayFrames
@@ -1769,7 +1771,7 @@ BattleCommand_CheckHit:
 	ret
 
 .StatModifiers:
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 
 	; load the user's accuracy into b and the opponent's evasion into c.
@@ -1805,10 +1807,10 @@ BattleCommand_CheckHit:
 	ld c, a
 	; store the base move accuracy for math ops
 	xor a
-	ld [hMultiplicand + 0], a
-	ld [hMultiplicand + 1], a
+	ldh [hMultiplicand + 0], a
+	ldh [hMultiplicand + 1], a
 	ld a, [hl]
-	ld [hMultiplicand + 2], a
+	ldh [hMultiplicand + 2], a
 	push hl
 	ld d, 2 ; do this twice, once for the user's accuracy and once for the target's evasion
 
@@ -1824,22 +1826,22 @@ BattleCommand_CheckHit:
 	pop bc
 	; multiply by the first byte in that row...
 	ld a, [hli]
-	ld [hMultiplier], a
+	ldh [hMultiplier], a
 	call Multiply
 	; ... and divide by the second byte
 	ld a, [hl]
-	ld [hDivisor], a
+	ldh [hDivisor], a
 	ld b, 4
 	call Divide
 	; minimum accuracy is $0001
-	ld a, [hQuotient + 2]
+	ldh a, [hQuotient + 3]
 	ld b, a
-	ld a, [hQuotient + 1]
+	ldh a, [hQuotient + 2]
 	or b
 	jr nz, .min_accuracy
-	ld [hQuotient + 1], a
+	ldh [hQuotient + 2], a
 	ld a, 1
-	ld [hQuotient + 2], a
+	ldh [hQuotient + 3], a
 
 .min_accuracy
 	; do the same thing to the target's evasion
@@ -1848,9 +1850,9 @@ BattleCommand_CheckHit:
 	jr nz, .accuracy_loop
 
 	; if the result is more than 2 bytes, max out at 100%
-	ld a, [hQuotient + 1]
+	ldh a, [hQuotient + 2]
 	and a
-	ld a, [hQuotient + 2]
+	ldh a, [hQuotient + 3]
 	jr z, .finish_accuracy
 	ld a, $ff
 
@@ -1871,12 +1873,14 @@ BattleCommand_EffectChance:
 
 	push hl
 	ld hl, wPlayerMoveStruct + MOVE_CHANCE
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .got_move_chance
 	ld hl, wEnemyMoveStruct + MOVE_CHANCE
 .got_move_chance
 
+	; BUG: 1/256 chance to fail even for a 100% effect chance,
+	; since carry is not set if BattleRandom == [hl] == 255
 	call BattleRandom
 	cp [hl]
 	pop hl
@@ -1967,7 +1971,7 @@ BattleCommand_MoveAnimNoSub:
 	and a
 	jp nz, BattleCommand_MoveDelay
 
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	ld de, wPlayerRolloutCount
 	ld a, BATTLEANIM_ENEMY_DAMAGE
@@ -2039,7 +2043,7 @@ BattleCommand_StatDownAnim:
 	and a
 	jp nz, BattleCommand_MoveDelay
 
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	ld a, BATTLEANIM_ENEMY_STAT_DOWN
 	jr z, BattleCommand_StatUpDownAnim
@@ -2060,9 +2064,9 @@ BattleCommand_StatUpDownAnim:
 BattleCommand_SwitchTurn:
 ; switchturn
 
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	xor 1
-	ld [hBattleTurn], a
+	ldh [hBattleTurn], a
 	ret
 
 BattleCommand_RaiseSub:
@@ -2159,7 +2163,7 @@ BattleCommand_ApplyDamage:
 	push bc
 	call .update_damage_taken
 	ld c, FALSE
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr nz, .damage_player
 	call DoEnemyDamage
@@ -2177,7 +2181,7 @@ BattleCommand_ApplyDamage:
 	dec a
 	jr nz, .focus_band_text
 	ld hl, EnduredText
-	jp StdBattleTextBox
+	jp StdBattleTextbox
 
 .focus_band_text
 	call GetOpponentItem
@@ -2185,7 +2189,7 @@ BattleCommand_ApplyDamage:
 	ld [wNamedObjectIndexBuffer], a
 	call GetItemName
 	ld hl, HungOnText
-	jp StdBattleTextBox
+	jp StdBattleTextbox
 
 .update_damage_taken
 	ld a, BATTLE_VARS_SUBSTATUS4_OPP
@@ -2194,7 +2198,7 @@ BattleCommand_ApplyDamage:
 	ret nz
 
 	ld de, wPlayerDamageTaken + 1
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr nz, .got_damage_taken
 	ld de, wEnemyDamageTaken + 1
@@ -2266,12 +2270,12 @@ endr
 	ld [hl], a
 .do_at_least_1_damage
 	ld hl, CrashedText
-	call StdBattleTextBox
+	call StdBattleTextbox
 	ld a, $1
 	ld [wKickCounter], a
 	call LoadMoveAnim
 	ld c, TRUE
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jp nz, DoEnemyDamage
 	jp DoPlayerDamage
@@ -2284,7 +2288,7 @@ FailText_CheckOpponentProtect:
 	ld h, d
 	ld l, e
 .not_protected
-	jp StdBattleTextBox
+	jp StdBattleTextbox
 
 BattleCommand_BideFailText:
 	ld a, [wAttackMissed]
@@ -2314,7 +2318,7 @@ BattleCommand_CriticalText:
 	ld a, [hli]
 	ld h, [hl]
 	ld l, a
-	call StdBattleTextBox
+	call StdBattleTextbox
 
 	xor a
 	ld [wCriticalHit], a
@@ -2331,7 +2335,7 @@ BattleCommand_StartLoop:
 ; startloop
 
 	ld hl, wPlayerRolloutCount
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .ok
 	ld hl, wEnemyRolloutCount
@@ -2361,7 +2365,7 @@ BattleCommand_SuperEffectiveText:
 	jr nc, .print
 	ld hl, NotVeryEffectiveText
 .print
-	jp StdBattleTextBox
+	jp StdBattleTextbox
 
 BattleCommand_CheckFaint:
 ; checkfaint
@@ -2371,7 +2375,7 @@ BattleCommand_CheckFaint:
 ; Ends the move effect if the opponent faints.
 
 	ld hl, wEnemyMonHP
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .got_hp
 	ld hl, wBattleMonHP
@@ -2387,9 +2391,9 @@ BattleCommand_CheckFaint:
 	jr z, .no_dbond
 
 	ld hl, TookDownWithItText
-	call StdBattleTextBox
+	call StdBattleTextbox
 
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	ld hl, wEnemyMonMaxHP + 1
 	bccoord 2, 2 ; hp bar
@@ -2468,7 +2472,7 @@ BattleCommand_BuildOpponentRage:
 	ret z
 
 	ld de, wEnemyRageCounter
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .player
 	ld de, wPlayerRageCounter
@@ -2480,7 +2484,7 @@ BattleCommand_BuildOpponentRage:
 
 	call BattleCommand_SwitchTurn
 	ld hl, RageBuildingText
-	call StdBattleTextBox
+	call StdBattleTextbox
 	jp BattleCommand_SwitchTurn
 
 BattleCommand_RageDamage:
@@ -2492,7 +2496,7 @@ BattleCommand_RageDamage:
 	ld a, [wCurDamage + 1]
 	ld l, a
 	ld c, a
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	ld a, [wPlayerRageCounter]
 	jr z, .rage_loop
@@ -2525,7 +2529,7 @@ EndMoveEffect:
 DittoMetalPowder:
 	ld a, MON_SPECIES
 	call BattlePartyAttr
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	ld a, [hl]
 	jr nz, .Ditto
@@ -2561,7 +2565,7 @@ DittoMetalPowder:
 BattleCommand_DamageStats:
 ; damagestats
 
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jp nz, EnemyAttackDamage
 
@@ -2706,7 +2710,7 @@ CheckDamageStatsCritical:
 
 	push hl
 	push bc
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr nz, .enemy
 	ld a, [wPlayerMoveStructType]
@@ -2784,7 +2788,7 @@ SpeciesItemBoost:
 	ld a, MON_SPECIES
 	call BattlePartyAttr
 
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	ld a, [hl]
 	jr z, .CompareSpecies
@@ -2900,7 +2904,7 @@ BattleCommand_ClearMissDamage:
 
 HitSelfInConfusion:
 	call ResetDamage
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	ld hl, wBattleMonDefense
 	ld de, wPlayerScreens
@@ -2984,7 +2988,7 @@ BattleCommand_DamageCalc:
 	ld a, e
 	add a
 	jr nc, .level_not_overflowing
-	ld [hl], $1
+	ld [hl], 1
 .level_not_overflowing
 	inc hl
 	ld [hli], a
@@ -2993,7 +2997,7 @@ BattleCommand_DamageCalc:
 	ld a, 5
 	ld [hld], a
 	push bc
-	ld b, $4
+	ld b, 4
 	call Divide
 	pop bc
 
@@ -3012,7 +3016,7 @@ BattleCommand_DamageCalc:
 
 ; / Defense
 	ld [hl], c
-	ld b, $4
+	ld b, 4
 	call Divide
 
 ; / 50
@@ -3049,12 +3053,12 @@ BattleCommand_DamageCalc:
 ; * 100 + item effect amount
 	ld a, c
 	add 100
-	ld [hMultiplier], a
+	ldh [hMultiplier], a
 	call Multiply
 
 ; / 100
 	ld a, 100
-	ld [hDivisor], a
+	ldh [hDivisor], a
 	ld b, 4
 	call Divide
 
@@ -3065,44 +3069,44 @@ BattleCommand_DamageCalc:
 ; Update wCurDamage (capped at 997).
 	ld hl, wCurDamage
 	ld b, [hl]
-	ld a, [hProduct + 3]
+	ldh a, [hProduct + 3]
 	add b
-	ld [hProduct + 3], a
+	ldh [hProduct + 3], a
 	jr nc, .dont_cap_1
 
-	ld a, [hProduct + 2]
+	ldh a, [hProduct + 2]
 	inc a
-	ld [hProduct + 2], a
+	ldh [hProduct + 2], a
 	and a
 	jr z, .Cap
 
 .dont_cap_1
-	ld a, [hProduct]
+	ldh a, [hProduct]
 	ld b, a
-	ld a, [hProduct + 1]
+	ldh a, [hProduct + 1]
 	or a
 	jr nz, .Cap
 
-	ld a, [hProduct + 2]
+	ldh a, [hProduct + 2]
 	cp HIGH(MAX_STAT_VALUE - MIN_NEUTRAL_DAMAGE + 1)
 	jr c, .dont_cap_2
 
 	cp HIGH(MAX_STAT_VALUE - MIN_NEUTRAL_DAMAGE + 1) + 1
 	jr nc, .Cap
 
-	ld a, [hProduct + 3]
+	ldh a, [hProduct + 3]
 	cp LOW(MAX_STAT_VALUE - MIN_NEUTRAL_DAMAGE + 1)
 	jr nc, .Cap
 
 .dont_cap_2
 	inc hl
 
-	ld a, [hProduct + 3]
+	ldh a, [hProduct + 3]
 	ld b, [hl]
 	add b
 	ld [hld], a
 
-	ld a, [hProduct + 2]
+	ldh a, [hProduct + 2]
 	ld b, [hl]
 	adc b
 	ld [hl], a
@@ -3146,20 +3150,20 @@ BattleCommand_DamageCalc:
 	ret z
 
 ; x2
-	ld a, [hQuotient + 2]
+	ldh a, [hQuotient + 3]
 	add a
-	ld [hProduct + 3], a
+	ldh [hProduct + 3], a
 
-	ld a, [hQuotient + 1]
+	ldh a, [hQuotient + 2]
 	rl a
-	ld [hProduct + 2], a
+	ldh [hProduct + 2], a
 
 ; Cap at $ffff.
 	ret nc
 
 	ld a, $ff
-	ld [hProduct + 2], a
-	ld [hProduct + 3], a
+	ldh [hProduct + 2], a
+	ldh [hProduct + 3], a
 
 	ret
 
@@ -3169,7 +3173,7 @@ BattleCommand_ConstantDamage:
 ; constantdamage
 
 	ld hl, wBattleMonLevel
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .got_turn
 	ld hl, wEnemyMonLevel
@@ -3216,7 +3220,7 @@ BattleCommand_ConstantDamage:
 
 .super_fang
 	ld hl, wEnemyMonHP
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .got_hp
 	ld hl, wBattleMonHP
@@ -3245,50 +3249,50 @@ BattleCommand_ConstantDamage:
 
 .reversal
 	ld hl, wBattleMonHP
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .reversal_got_hp
 	ld hl, wEnemyMonHP
 .reversal_got_hp
 	xor a
-	ld [hDividend], a
-	ld [hMultiplicand + 0], a
+	ldh [hDividend], a
+	ldh [hMultiplicand + 0], a
 	ld a, [hli]
-	ld [hMultiplicand + 1], a
+	ldh [hMultiplicand + 1], a
 	ld a, [hli]
-	ld [hMultiplicand + 2], a
-	ld a, $30
-	ld [hMultiplier], a
+	ldh [hMultiplicand + 2], a
+	ld a, 48
+	ldh [hMultiplier], a
 	call Multiply
 	ld a, [hli]
 	ld b, a
 	ld a, [hl]
-	ld [hDivisor], a
+	ldh [hDivisor], a
 	ld a, b
 	and a
 	jr z, .skip_to_divide
 
-	ld a, [hProduct + 4]
+	ldh a, [hProduct + 4]
 	srl b
 	rr a
 	srl b
 	rr a
-	ld [hDivisor], a
-	ld a, [hProduct + 2]
+	ldh [hDivisor], a
+	ldh a, [hProduct + 2]
 	ld b, a
 	srl b
-	ld a, [hProduct + 3]
+	ldh a, [hProduct + 3]
 	rr a
 	srl b
 	rr a
-	ld [hDividend + 3], a
+	ldh [hDividend + 3], a
 	ld a, b
-	ld [hDividend + 2], a
+	ldh [hDividend + 2], a
 
 .skip_to_divide
 	ld b, 4
 	call Divide
-	ld a, [hQuotient + 2]
+	ldh a, [hQuotient + 3]
 	ld b, a
 	ld hl, FlailReversalPower
 
@@ -3300,7 +3304,7 @@ BattleCommand_ConstantDamage:
 	jr .reversal_loop
 
 .break_loop
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	ld a, [hl]
 	jr nz, .notPlayersTurn
@@ -3518,10 +3522,10 @@ DoPlayerDamage:
 
 DoSubstituteDamage:
 	ld hl, SubTookDamageText
-	call StdBattleTextBox
+	call StdBattleTextbox
 
 	ld de, wEnemySubstituteHP
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .got_hp
 	ld de, wPlayerSubstituteHP
@@ -3544,7 +3548,7 @@ DoSubstituteDamage:
 	res SUBSTATUS_SUBSTITUTE, [hl]
 
 	ld hl, SubFadedText
-	call StdBattleTextBox
+	call StdBattleTextbox
 
 	call BattleCommand_SwitchTurn
 	call BattleCommand_LowerSubNoAnim
@@ -3647,7 +3651,7 @@ BattleCommand_SleepTarget:
 	call RefreshBattleHuds
 
 	ld hl, FellAsleepText
-	call StdBattleTextBox
+	call StdBattleTextbox
 
 	farcall UseHeldStatusHealingItem
 
@@ -3658,11 +3662,11 @@ BattleCommand_SleepTarget:
 	push hl
 	call AnimateFailedMove
 	pop hl
-	jp StdBattleTextBox
+	jp StdBattleTextbox
 
 .CheckAIRandomFail:
 	; Enemy turn
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .dont_fail
 
@@ -3718,7 +3722,7 @@ BattleCommand_PoisonTarget:
 	call RefreshBattleHuds
 
 	ld hl, WasPoisonedText
-	call StdBattleTextBox
+	call StdBattleTextbox
 
 	farcall UseHeldStatusHealingItem
 	ret
@@ -3758,7 +3762,7 @@ BattleCommand_Poison:
 	and a
 	jr nz, .failed
 
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .dont_sample_failure
 
@@ -3789,7 +3793,7 @@ BattleCommand_Poison:
 
 	call .apply_poison
 	ld hl, WasPoisonedText
-	call StdBattleTextBox
+	call StdBattleTextbox
 	jr .finished
 
 .toxic
@@ -3799,7 +3803,7 @@ BattleCommand_Poison:
 	call .apply_poison
 
 	ld hl, BadlyPoisonedText
-	call StdBattleTextBox
+	call StdBattleTextbox
 
 .finished
 	farcall UseHeldStatusHealingItem
@@ -3809,7 +3813,7 @@ BattleCommand_Poison:
 	push hl
 	call AnimateFailedMove
 	pop hl
-	jp StdBattleTextBox
+	jp StdBattleTextbox
 
 .apply_poison
 	call AnimateCurrentMove
@@ -3819,7 +3823,7 @@ BattleCommand_Poison:
 .check_toxic
 	ld a, BATTLE_VARS_SUBSTATUS5_OPP
 	call GetBattleVarAddr
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	ld de, wEnemyToxicCount
 	jr z, .ok
@@ -3832,7 +3836,7 @@ BattleCommand_Poison:
 
 CheckIfTargetIsPoisonType:
 	ld de, wEnemyMonType1
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .ok
 	ld de, wBattleMonType1
@@ -3855,33 +3859,33 @@ BattleCommand_DrainTarget:
 ; draintarget
 	call SapHealth
 	ld hl, SuckedHealthText
-	jp StdBattleTextBox
+	jp StdBattleTextbox
 
 BattleCommand_EatDream:
 ; eatdream
 	call SapHealth
 	ld hl, DreamEatenText
-	jp StdBattleTextBox
+	jp StdBattleTextbox
 
 SapHealth:
 	; Divide damage by 2, store it in hDividend
 	ld hl, wCurDamage
 	ld a, [hli]
 	srl a
-	ld [hDividend], a
+	ldh [hDividend], a
 	ld b, a
 	ld a, [hl]
 	rr a
-	ld [hDividend + 1], a
+	ldh [hDividend + 1], a
 	or b
 	jr nz, .at_least_one
 	ld a, 1
-	ld [hDividend + 1], a
+	ldh [hDividend + 1], a
 .at_least_one
 
 	ld hl, wBattleMonHP
 	ld de, wBattleMonMaxHP
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .battlemonhp
 	ld hl, wEnemyMonHP
@@ -3906,12 +3910,12 @@ SapHealth:
 	ld [bc], a
 
 	; Add hDividend to current HP and copy it to little endian wBuffer5/6
-	ld a, [hDividend + 1]
+	ldh a, [hDividend + 1]
 	ld b, [hl]
 	add b
 	ld [hld], a
 	ld [wBuffer5], a
-	ld a, [hDividend]
+	ldh a, [hDividend]
 	ld b, [hl]
 	adc b
 	ld [hli], a
@@ -3943,7 +3947,7 @@ SapHealth:
 	inc de
 
 .finish
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	hlcoord 10, 9
 	ld a, $1
@@ -3992,7 +3996,7 @@ BattleCommand_BurnTarget:
 	call RefreshBattleHuds
 
 	ld hl, WasBurnedText
-	call StdBattleTextBox
+	call StdBattleTextbox
 
 	farcall UseHeldStatusHealingItem
 	ret
@@ -4005,7 +4009,7 @@ Defrost:
 	xor a
 	ld [hl], a
 
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	ld a, [wCurOTMon]
 	ld hl, wOTPartyMon1Status
@@ -4020,7 +4024,7 @@ Defrost:
 	call UpdateOpponentInParty
 
 	ld hl, DefrostedOpponentText
-	jp StdBattleTextBox
+	jp StdBattleTextbox
 
 BattleCommand_FreezeTarget:
 ; freezetarget
@@ -4059,7 +4063,7 @@ BattleCommand_FreezeTarget:
 	call RefreshBattleHuds
 
 	ld hl, WasFrozenText
-	call StdBattleTextBox
+	call StdBattleTextbox
 
 	farcall UseHeldStatusHealingItem
 	ret nz
@@ -4067,7 +4071,7 @@ BattleCommand_FreezeTarget:
 	call OpponentCantMove
 	call EndRechargeOpp
 	ld hl, wEnemyJustGotFrozen
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .finish
 	ld hl, wPlayerJustGotFrozen
@@ -4193,7 +4197,7 @@ RaiseStat:
 	ld a, b
 	ld [wLoweredStat], a
 	ld hl, wPlayerStatLevels
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .got_stat_levels
 	ld hl, wEnemyStatLevels
@@ -4230,7 +4234,7 @@ RaiseStat:
 	jr nc, .done_calcing_stats
 	ld hl, wBattleMonStats + 1
 	ld de, wPlayerStats
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .got_stats_pointer
 	ld hl, wEnemyMonStats + 1
@@ -4254,7 +4258,7 @@ RaiseStat:
 	sbc HIGH(MAX_STAT_VALUE)
 	jp z, .stats_already_max
 .not_already_max
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .calc_player_stats
 	call CalcEnemyStats
@@ -4290,7 +4294,7 @@ MinimizeDropSub:
 
 	ld bc, wPlayerMinimized
 	ld hl, DropPlayerSub
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .do_player
 	ld bc, wEnemyMinimized
@@ -4307,7 +4311,7 @@ MinimizeDropSub:
 	ret nc
 
 	xor a
-	ld [hBGMapMode], a
+	ldh [hBGMapMode], a
 	call CallBattleCore
 	call WaitBGMap
 	jp BattleCommand_MoveDelay
@@ -4390,7 +4394,7 @@ BattleCommand_StatDown:
 	jp nz, .Mist
 
 	ld hl, wEnemyStatLevels
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .GetStatLevel
 	ld hl, wPlayerStatLevels
@@ -4416,7 +4420,7 @@ BattleCommand_StatDown:
 
 .ComputerMiss:
 ; Computer opponents have a 25% chance of failing.
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .DidntMiss
 
@@ -4467,7 +4471,7 @@ BattleCommand_StatDown:
 	push hl
 	ld hl, wEnemyMonAttack + 1
 	ld de, wEnemyStats
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .do_enemy
 	ld hl, wBattleMonAttack + 1
@@ -4539,25 +4543,25 @@ BattleCommand_StatUpMessage:
 	inc b
 	call GetStatName
 	ld hl, .stat
-	jp BattleTextBox
+	jp BattleTextbox
 
 .stat
-	text_jump UnknownText_0x1c0cc6
-	start_asm
-	ld hl, .up
+	text_far Text_BattleEffectActivate
+	text_asm
+	ld hl, .BattleStatWentUpText
 	ld a, [wLoweredStat]
 	and $f0
 	ret z
-	ld hl, .wayup
+	ld hl, .BattleStatWentWayUpText
 	ret
 
-.wayup
-	text_jump UnknownText_0x1c0cd0
-	db "@"
+.BattleStatWentWayUpText:
+	text_far _BattleStatWentWayUpText
+	text_end
 
-.up
-	text_jump UnknownText_0x1c0ce0
-	db "@"
+.BattleStatWentUpText:
+	text_far _BattleStatWentUpText
+	text_end
 
 BattleCommand_StatDownMessage:
 	ld a, [wFailedMessage]
@@ -4569,24 +4573,25 @@ BattleCommand_StatDownMessage:
 	inc b
 	call GetStatName
 	ld hl, .stat
-	jp BattleTextBox
+	jp BattleTextbox
 
 .stat
-	text_jump UnknownText_0x1c0ceb
-	start_asm
-	ld hl, .fell
+	text_far Text_BattleFoeEffectActivate
+	text_asm
+	ld hl, .BattleStatFellText
 	ld a, [wLoweredStat]
 	and $f0
 	ret z
-	ld hl, .sharplyfell
+	ld hl, .BattleStatSharplyFellText
 	ret
 
-.sharplyfell
-	text_jump UnknownText_0x1c0cf5
-	db "@"
-.fell
-	text_jump UnknownText_0x1c0d06
-	db "@"
+.BattleStatSharplyFellText:
+	text_far _BattleStatSharplyFellText
+	text_end
+
+.BattleStatFellText:
+	text_far _BattleStatFellText
+	text_end
 
 TryLowerStat:
 ; Lower stat c from stat struct hl (buffer de).
@@ -4613,7 +4618,7 @@ TryLowerStat:
 	ret z
 
 .not_min
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .Player
 
@@ -4647,7 +4652,7 @@ BattleCommand_StatUpFailText:
 	inc b
 	call GetStatName
 	ld hl, WontRiseAnymoreText
-	jp StdBattleTextBox
+	jp StdBattleTextbox
 
 BattleCommand_StatDownFailText:
 ; statdownfailtext
@@ -4661,14 +4666,14 @@ BattleCommand_StatDownFailText:
 	jp z, TryPrintButItFailed
 	dec a
 	ld hl, ProtectedByMistText
-	jp z, StdBattleTextBox
+	jp z, StdBattleTextbox
 	ld a, [wLoweredStat]
 	and $f
 	ld b, a
 	inc b
 	call GetStatName
 	ld hl, WontDropAnymoreText
-	jp StdBattleTextBox
+	jp StdBattleTextbox
 
 GetStatName:
 	ld hl, StatNames
@@ -4728,7 +4733,7 @@ LowerStat:
 	ld [wLoweredStat], a
 
 	ld hl, wPlayerStatLevels
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .got_target
 	ld hl, wEnemyStatLevels
@@ -4759,7 +4764,7 @@ LowerStat:
 	push hl
 	ld hl, wBattleMonStats + 1
 	ld de, wPlayerStats
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .got_target_2
 	ld hl, wEnemyMonStats + 1
@@ -4771,7 +4776,7 @@ LowerStat:
 	jr z, .failed
 
 .accuracy_evasion
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .player
 
@@ -4825,25 +4830,25 @@ BattleCommand_Curl:
 
 BattleCommand_RaiseSubNoAnim:
 	ld hl, GetBattleMonBackpic
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .PlayerTurn
 	ld hl, GetEnemyMonFrontpic
 .PlayerTurn:
 	xor a
-	ld [hBGMapMode], a
+	ldh [hBGMapMode], a
 	call CallBattleCore
 	jp WaitBGMap
 
 BattleCommand_LowerSubNoAnim:
 	ld hl, DropPlayerSub
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .PlayerTurn
 	ld hl, DropEnemySub
 .PlayerTurn:
 	xor a
-	ld [hBGMapMode], a
+	ldh [hBGMapMode], a
 	call CallBattleCore
 	jp WaitBGMap
 
@@ -4853,7 +4858,7 @@ CalcPlayerStats:
 	ld bc, wBattleMonAttack
 
 	ld a, 5
-	call CalcStats
+	call CalcBattleStats
 
 	ld hl, BadgeStatBoosts
 	call CallBattleCore
@@ -4874,7 +4879,7 @@ CalcEnemyStats:
 	ld bc, wEnemyMonAttack
 
 	ld a, 5
-	call CalcStats
+	call CalcBattleStats
 
 	call BattleCommand_SwitchTurn
 
@@ -4886,7 +4891,7 @@ CalcEnemyStats:
 
 	jp BattleCommand_SwitchTurn
 
-CalcStats:
+CalcBattleStats:
 .loop
 	push af
 	ld a, [hli]
@@ -4901,51 +4906,51 @@ CalcStats:
 	add hl, bc
 
 	xor a
-	ld [hMultiplicand + 0], a
+	ldh [hMultiplicand + 0], a
 	ld a, [de]
-	ld [hMultiplicand + 1], a
+	ldh [hMultiplicand + 1], a
 	inc de
 	ld a, [de]
-	ld [hMultiplicand + 2], a
+	ldh [hMultiplicand + 2], a
 	inc de
 
 	ld a, [hli]
-	ld [hMultiplier], a
+	ldh [hMultiplier], a
 	call Multiply
 
 	ld a, [hl]
-	ld [hDivisor], a
+	ldh [hDivisor], a
 	ld b, 4
 	call Divide
 
-	ld a, [hQuotient + 1]
+	ldh a, [hQuotient + 2]
 	ld b, a
-	ld a, [hQuotient + 2]
+	ldh a, [hQuotient + 3]
 	or b
 	jr nz, .check_maxed_out
 
 	ld a, 1
-	ld [hQuotient + 2], a
+	ldh [hQuotient + 3], a
 	jr .not_maxed_out
 
 .check_maxed_out
-	ld a, [hQuotient + 2]
+	ldh a, [hQuotient + 3]
 	cp LOW(MAX_STAT_VALUE)
 	ld a, b
 	sbc HIGH(MAX_STAT_VALUE)
 	jr c, .not_maxed_out
 
 	ld a, LOW(MAX_STAT_VALUE)
-	ld [hQuotient + 2], a
+	ldh [hQuotient + 3], a
 	ld a, HIGH(MAX_STAT_VALUE)
-	ld [hQuotient + 1], a
+	ldh [hQuotient + 2], a
 
 .not_maxed_out
 	pop bc
-	ld a, [hQuotient + 1]
+	ldh a, [hQuotient + 2]
 	ld [bc], a
 	inc bc
-	ld a, [hQuotient + 2]
+	ldh a, [hQuotient + 3]
 	ld [bc], a
 	inc bc
 	pop hl
@@ -4961,7 +4966,7 @@ BattleCommand_CheckRampage:
 ; checkrampage
 
 	ld de, wPlayerRolloutCount
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .player
 	ld de, wEnemyRolloutCount
@@ -5004,7 +5009,7 @@ BattleCommand_Rampage:
 	ret nz
 
 	ld de, wPlayerRolloutCount
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .ok
 	ld de, wEnemyRolloutCount
@@ -5042,7 +5047,7 @@ BattleCommand_ForceSwitch:
 	jp z, .fail
 	cp BATTLETYPE_SUICUNE
 	jp z, .fail
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jp nz, .force_player_switch
 	ld a, [wAttackMissed]
@@ -5124,7 +5129,7 @@ BattleCommand_ForceSwitch:
 	callfar ForceEnemySwitch
 
 	ld hl, DraggedOutText
-	call StdBattleTextBox
+	call StdBattleTextbox
 
 	ld hl, SpikesDamage
 	jp CallBattleCore
@@ -5221,7 +5226,7 @@ BattleCommand_ForceSwitch:
 	call CallBattleCore
 
 	ld hl, DraggedOutText
-	call StdBattleTextBox
+	call StdBattleTextbox
 
 	ld hl, SpikesDamage
 	jp CallBattleCore
@@ -5247,7 +5252,7 @@ BattleCommand_ForceSwitch:
 	jr z, .do_text
 	ld hl, BlownAwayText
 .do_text
-	jp StdBattleTextBox
+	jp StdBattleTextbox
 
 CheckPlayerHasMonToSwitchTo:
 	ld a, [wPartyCount]
@@ -5285,7 +5290,7 @@ BattleCommand_EndLoop:
 
 	ld de, wPlayerRolloutCount
 	ld bc, wPlayerDamageTaken
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .got_addrs
 	ld de, wEnemyRolloutCount
@@ -5321,7 +5326,7 @@ BattleCommand_EndLoop:
 	jr .done_loop
 
 .beat_up
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr nz, .check_ot_beat_up
 	ld a, [wPartyCount]
@@ -5377,7 +5382,7 @@ BattleCommand_EndLoop:
 	res SUBSTATUS_IN_LOOP, [hl]
 
 	ld hl, PlayerHitTimesText
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .got_hit_n_times_text
 	ld hl, EnemyHitTimesText
@@ -5388,7 +5393,7 @@ BattleCommand_EndLoop:
 	call GetBattleVar
 	cp EFFECT_BEAT_UP
 	jr z, .beat_up_2
-	call StdBattleTextBox
+	call StdBattleTextbox
 .beat_up_2
 
 	pop bc
@@ -5463,7 +5468,7 @@ CheckOpponentWentFirst:
 	push bc
 	ld a, [wEnemyGoesFirst] ; 0 if player went first
 	ld b, a
-	ld a, [hBattleTurn] ; 0 if it's the player's turn
+	ldh a, [hBattleTurn] ; 0 if it's the player's turn
 	xor b ; 1 if opponent went first
 	pop bc
 	ret
@@ -5506,7 +5511,7 @@ BattleCommand_OHKO:
 	ld hl, wEnemyMonLevel
 	ld de, wBattleMonLevel
 	ld bc, wPlayerMoveStruct + MOVE_ACC
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .got_move_accuracy
 	push hl
@@ -5577,7 +5582,7 @@ BattleCommand_Charge:
 	ld hl, IgnoredOrders2Text
 	ld a, [wAlreadyDisobeyed]
 	and a
-	call nz, StdBattleTextBox
+	call nz, StdBattleTextbox
 
 	call BattleCommand_LowerSub
 	xor a
@@ -5626,7 +5631,7 @@ BattleCommand_Charge:
 	call ResetDamage
 
 	ld hl, .UsedText
-	call BattleTextBox
+	call BattleTextbox
 
 	ld a, BATTLE_VARS_MOVE_EFFECT
 	call GetBattleVar
@@ -5636,65 +5641,59 @@ BattleCommand_Charge:
 	jp EndMoveEffect
 
 .UsedText:
-	text_jump UnknownText_0x1c0d0e ; "<USER>"
-	start_asm
+	text_far Text_BattleUser ; "<USER>"
+	text_asm
 	ld a, BATTLE_VARS_MOVE_ANIM
 	call GetBattleVar
 	cp RAZOR_WIND
-	ld hl, .RazorWind
+	ld hl, .BattleMadeWhirlwindText
 	jr z, .done
 
 	cp SOLARBEAM
-	ld hl, .Solarbeam
+	ld hl, .BattleTookSunlightText
 	jr z, .done
 
 	cp SKULL_BASH
-	ld hl, .SkullBash
+	ld hl, .BattleLoweredHeadText
 	jr z, .done
 
 	cp SKY_ATTACK
-	ld hl, .SkyAttack
+	ld hl, .BattleGlowingText
 	jr z, .done
 
 	cp FLY
-	ld hl, .Fly
+	ld hl, .BattleFlewText
 	jr z, .done
 
 	cp DIG
-	ld hl, .Dig
+	ld hl, .BattleDugText
 
 .done
 	ret
 
-.RazorWind:
-; 'made a whirlwind!'
-	text_jump UnknownText_0x1c0d12
-	db "@"
+.BattleMadeWhirlwindText:
+	text_far _BattleMadeWhirlwindText
+	text_end
 
-.Solarbeam:
-; 'took in sunlight!'
-	text_jump UnknownText_0x1c0d26
-	db "@"
+.BattleTookSunlightText:
+	text_far _BattleTookSunlightText
+	text_end
 
-.SkullBash:
-; 'lowered its head!'
-	text_jump UnknownText_0x1c0d3a
-	db "@"
+.BattleLoweredHeadText:
+	text_far _BattleLoweredHeadText
+	text_end
 
-.SkyAttack:
-; 'is glowing!'
-	text_jump UnknownText_0x1c0d4e
-	db "@"
+.BattleGlowingText:
+	text_far _BattleGlowingText
+	text_end
 
-.Fly:
-; 'flew up high!'
-	text_jump UnknownText_0x1c0d5c
-	db "@"
+.BattleFlewText:
+	text_far _BattleFlewText
+	text_end
 
-.Dig:
-; 'dug a hole!'
-	text_jump UnknownText_0x1c0d6c
-	db "@"
+.BattleDugText:
+	text_far _BattleDugText
+	text_end
 
 BattleCommand3c:
 ; unused
@@ -5708,7 +5707,7 @@ BattleCommand_TrapTarget:
 	ret nz
 	ld hl, wEnemyWrapCount
 	ld de, wEnemyTrappingMove
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .got_trap
 	ld hl, wPlayerWrapCount
@@ -5747,7 +5746,7 @@ BattleCommand_TrapTarget:
 	ld a, [hli]
 	ld h, [hl]
 	ld l, a
-	jp StdBattleTextBox
+	jp StdBattleTextbox
 
 .Traps:
 	dbw BIND,      UsedBindText      ; 'used BIND on'
@@ -5764,7 +5763,7 @@ BattleCommand_Recoil:
 ; recoil
 
 	ld hl, wBattleMonMaxHP
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .got_hp
 	ld hl, wEnemyMonMaxHP
@@ -5811,7 +5810,7 @@ BattleCommand_Recoil:
 	ld [hl], a
 .dont_ko
 	hlcoord 10, 9
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	ld a, 1
 	jr z, .animate_hp_bar
@@ -5822,7 +5821,7 @@ BattleCommand_Recoil:
 	predef AnimateHPBar
 	call RefreshBattleHuds
 	ld hl, RecoilText
-	jp StdBattleTextBox
+	jp StdBattleTextbox
 
 BattleCommand_ConfuseTarget:
 ; confusetarget
@@ -5856,7 +5855,7 @@ BattleCommand_Confuse:
 	call GetItemName
 	call AnimateFailedMove
 	ld hl, ProtectedByText
-	jp StdBattleTextBox
+	jp StdBattleTextbox
 
 .no_item_protection
 	ld a, BATTLE_VARS_SUBSTATUS3_OPP
@@ -5865,7 +5864,7 @@ BattleCommand_Confuse:
 	jr z, .not_already_confused
 	call AnimateFailedMove
 	ld hl, AlreadyConfusedText
-	jp StdBattleTextBox
+	jp StdBattleTextbox
 
 .not_already_confused
 	call CheckSubstituteOpp
@@ -5875,7 +5874,7 @@ BattleCommand_Confuse:
 	jr nz, BattleCommand_Confuse_CheckSnore_Swagger_ConfuseHit
 BattleCommand_FinishConfusingTarget:
 	ld bc, wEnemyConfuseCount
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .got_confuse_count
 	ld bc, wPlayerConfuseCount
@@ -5904,7 +5903,7 @@ BattleCommand_FinishConfusingTarget:
 	call PlayOpponentBattleAnim
 
 	ld hl, BecameConfusedText
-	call StdBattleTextBox
+	call StdBattleTextbox
 
 	call GetOpponentItem
 	ld a, b
@@ -5946,10 +5945,10 @@ BattleCommand_Paralyze:
 	call GetItemName
 	call AnimateFailedMove
 	ld hl, ProtectedByText
-	jp StdBattleTextBox
+	jp StdBattleTextbox
 
 .no_item_protection
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .dont_sample_failure
 
@@ -5983,7 +5982,7 @@ BattleCommand_Paralyze:
 	call DelayFrames
 	call AnimateCurrentMove
 	ld a, $1
-	ld [hBGMapMode], a
+	ldh [hBGMapMode], a
 	ld a, BATTLE_VARS_STATUS_OPP
 	call GetBattleVarAddr
 	set PAR, [hl]
@@ -5998,7 +5997,7 @@ BattleCommand_Paralyze:
 .paralyzed
 	call AnimateFailedMove
 	ld hl, AlreadyParalyzedText
-	jp StdBattleTextBox
+	jp StdBattleTextbox
 
 .failed
 	jp PrintDidntAffect2
@@ -6015,7 +6014,7 @@ CheckMoveTypeMatchesTarget:
 	push hl
 
 	ld hl, wEnemyMonType1
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .ok
 	ld hl, wBattleMonType1
@@ -6112,7 +6111,7 @@ BattleCommand_ResetStats:
 	ld hl, wEnemyStatLevels
 	call .Fill
 
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	push af
 
 	call SetPlayerTurn
@@ -6121,12 +6120,12 @@ BattleCommand_ResetStats:
 	call CalcEnemyStats
 
 	pop af
-	ld [hBattleTurn], a
+	ldh [hBattleTurn], a
 
 	call AnimateCurrentMove
 
 	ld hl, EliminatedStatsText
-	jp StdBattleTextBox
+	jp StdBattleTextbox
 
 .Fill:
 	ld b, wPlayerStatLevelsEnd - wPlayerStatLevels
@@ -6141,7 +6140,7 @@ BattleCommand_Heal:
 
 	ld de, wBattleMonHP
 	ld hl, wBattleMonMaxHP
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .got_hp
 	ld de, wEnemyMonHP
@@ -6179,8 +6178,8 @@ BattleCommand_Heal:
 	jr z, .no_status_to_heal
 	ld hl, RestedText
 .no_status_to_heal
-	call StdBattleTextBox
-	ld a, [hBattleTurn]
+	call StdBattleTextbox
+	ldh a, [hBattleTurn]
 	and a
 	jr nz, .calc_enemy_stats
 	call CalcPlayerStats
@@ -6211,29 +6210,14 @@ BattleCommand_Heal:
 	call UpdateUserInParty
 	call RefreshBattleHuds
 	ld hl, RegainedHealthText
-	jp StdBattleTextBox
+	jp StdBattleTextbox
 
 .hp_full
 	call AnimateFailedMove
 	ld hl, HPIsFullText
-	jp StdBattleTextBox
+	jp StdBattleTextbox
 
 INCLUDE "engine/battle/move_effects/transform.asm"
-
-BattleSideCopy:
-; Copy bc bytes from hl to de if it's the player's turn.
-; Copy bc bytes from de to hl if it's the enemy's turn.
-	ld a, [hBattleTurn]
-	and a
-	jr z, .copy
-
-; Swap hl and de
-	push hl
-	ld h, d
-	ld l, e
-	pop de
-.copy
-	jp CopyBytes
 
 BattleEffect_ButItFailed:
 	call AnimateFailedMove
@@ -6252,7 +6236,7 @@ ClearLastMove:
 	ret
 
 ResetActorDisable:
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .player
 
@@ -6272,7 +6256,7 @@ BattleCommand_Screen:
 
 	ld hl, wPlayerScreens
 	ld bc, wPlayerLightScreenCount
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .got_screens_pointer
 	ld hl, wEnemyScreens
@@ -6306,7 +6290,7 @@ BattleCommand_Screen:
 
 .good
 	call AnimateCurrentMove
-	jp StdBattleTextBox
+	jp StdBattleTextbox
 
 .failed
 	call AnimateFailedMove
@@ -6315,12 +6299,12 @@ BattleCommand_Screen:
 PrintDoesntAffect:
 ; 'it doesn't affect'
 	ld hl, DoesntAffectText
-	jp StdBattleTextBox
+	jp StdBattleTextbox
 
 PrintNothingHappened:
 ; 'but nothing happened!'
 	ld hl, NothingHappenedText
-	jp StdBattleTextBox
+	jp StdBattleTextbox
 
 TryPrintButItFailed:
 	ld a, [wAlreadyFailed]
@@ -6332,7 +6316,7 @@ TryPrintButItFailed:
 PrintButItFailed:
 ; 'but it failed!'
 	ld hl, ButItFailedText
-	jp StdBattleTextBox
+	jp StdBattleTextbox
 
 FailMove:
 	call AnimateFailedMove
@@ -6346,7 +6330,7 @@ FailMimic:
 PrintDidntAffect:
 ; 'it didn't affect'
 	ld hl, DidntAffect1Text
-	jp StdBattleTextBox
+	jp StdBattleTextbox
 
 PrintDidntAffect2:
 	call AnimateFailedMove
@@ -6357,7 +6341,7 @@ PrintDidntAffect2:
 PrintParalyze:
 ; 'paralyzed! maybe it can't attack!'
 	ld hl, ParalyzedText
-	jp StdBattleTextBox
+	jp StdBattleTextbox
 
 CheckSubstituteOpp:
 	ld a, BATTLE_VARS_SUBSTATUS4_OPP
@@ -6375,7 +6359,7 @@ CheckUserMove:
 ; Return z if the user has move a.
 	ld b, a
 	ld de, wBattleMonMoves
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .ok
 	ld de, wEnemyMonMoves
@@ -6397,7 +6381,7 @@ CheckUserMove:
 
 ResetTurn:
 	ld hl, wPlayerCharging
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .player
 	ld hl, wEnemyCharging
@@ -6431,7 +6415,7 @@ BattleCommand_ArenaTrap:
 	set SUBSTATUS_CANT_RUN, [hl]
 	call AnimateCurrentMove
 	ld hl, CantEscapeNowText
-	jp StdBattleTextBox
+	jp StdBattleTextbox
 
 .failed
 	call AnimateFailedMove
@@ -6452,7 +6436,7 @@ BattleCommand_Defrost:
 
 ; Don't update the enemy's party struct in a wild battle.
 
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .party
 
@@ -6468,7 +6452,7 @@ BattleCommand_Defrost:
 .done
 	call RefreshBattleHuds
 	ld hl, WasDefrostedText
-	jp StdBattleTextBox
+	jp StdBattleTextbox
 
 INCLUDE "engine/battle/move_effects/curse.asm"
 
@@ -6505,7 +6489,7 @@ INCLUDE "engine/battle/move_effects/safeguard.asm"
 SafeCheckSafeguard:
 	push hl
 	ld hl, wEnemyScreens
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .got_turn
 	ld hl, wPlayerScreens
@@ -6518,7 +6502,7 @@ SafeCheckSafeguard:
 BattleCommand_CheckSafeguard:
 ; checksafeguard
 	ld hl, wEnemyScreens
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .got_turn
 	ld hl, wPlayerScreens
@@ -6529,7 +6513,7 @@ BattleCommand_CheckSafeguard:
 	ld [wAttackMissed], a
 	call BattleCommand_MoveDelay
 	ld hl, SafeguardProtectText
-	call StdBattleTextBox
+	call StdBattleTextbox
 	jp EndMoveEffect
 
 INCLUDE "engine/battle/move_effects/magnitude.asm"
@@ -6560,7 +6544,7 @@ BattleCommand_TimeBasedHealContinue:
 
 	ld hl, wBattleMonMaxHP
 	ld de, wBattleMonHP
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .start
 	ld hl, wEnemyMonMaxHP
@@ -6622,14 +6606,14 @@ BattleCommand_TimeBasedHealContinue:
 
 ; 'regained health!'
 	ld hl, RegainedHealthText
-	jp StdBattleTextBox
+	jp StdBattleTextbox
 
 .Full:
 	call AnimateFailedMove
 
 ; 'hp is full!'
 	ld hl, HPIsFullText
-	jp StdBattleTextBox
+	jp StdBattleTextbox
 
 .Multipliers:
 	dw GetEighthMaxHP
@@ -6653,7 +6637,7 @@ BattleCommand_DoubleMinimizeDamage:
 ; doubleminimizedamage
 
 	ld hl, wEnemyMinimized
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .ok
 	ld hl, wPlayerMinimized
@@ -6693,7 +6677,7 @@ CheckHiddenOpponent:
 GetUserItem:
 ; Return the effect of the user's item in bc, and its id at hl.
 	ld hl, wBattleMonItem
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .go
 	ld hl, wEnemyMonItem
@@ -6704,7 +6688,7 @@ GetUserItem:
 GetOpponentItem:
 ; Return the effect of the opponent's item in bc, and its id at hl.
 	ld hl, wEnemyMonItem
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .go
 	ld hl, wBattleMonItem
@@ -6775,7 +6759,7 @@ PlayDamageAnim:
 
 	ld [wFXAnimID], a
 
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	ld a, BATTLEANIM_ENEMY_DAMAGE
 	jr z, .player
@@ -6855,10 +6839,10 @@ BattleCommand_ClearText:
 
 ; Used in multi-hit moves.
 	ld hl, .text
-	jp BattleTextBox
+	jp BattleTextbox
 
-.text
-	db "@"
+.text:
+	text_end
 
 SkipToBattleCommand:
 ; Skip over commands until reaching command b.

@@ -1,4 +1,4 @@
-	const_def 2 ; object constants
+	object_const_def ; object_event constants
 	const SPROUTTOWER3F_SAGE1
 	const SPROUTTOWER3F_SAGE2
 	const SPROUTTOWER3F_SAGE3
@@ -34,7 +34,7 @@ SproutTower3FRivalScene:
 	applymovement PLAYER, MovementData_0x184a1d
 	applymovement SPROUTTOWER3F_SILVER, MovementData_0x184a22
 	opentext
-	writetext UnknownText_0x184a27
+	writetext SproutTowerElderLecturesRivalText
 	waitbutton
 	closetext
 	showemote EMOTE_SHOCK, SPROUTTOWER3F_SILVER, 15
@@ -75,7 +75,7 @@ SageLiScript:
 	reloadmapafterbattle
 	opentext
 	writetext SageLiTakeThisFlashText
-	buttonsound
+	promptbutton
 	verbosegiveitem HM_FLASH
 	setevent EVENT_GOT_HM05_FLASH
 	setevent EVENT_BEAT_SAGE_LI
@@ -151,7 +151,7 @@ MovementData_0x184a24:
 	step DOWN
 	step_end
 
-UnknownText_0x184a27:
+SproutTowerElderLecturesRivalText:
 	text "ELDER: You are in-"
 	line "deed skilled as a"
 	cont "trainer."

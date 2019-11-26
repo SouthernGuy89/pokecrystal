@@ -3,7 +3,7 @@ BattleCommand_Conversion:
 
 	ld hl, wBattleMonMoves
 	ld de, wBattleMonType1
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .got_moves
 	ld hl, wEnemyMonMoves
@@ -93,4 +93,4 @@ BattleCommand_Conversion:
 	farcall GetTypeName
 	call AnimateCurrentMove
 	ld hl, TransformedTypeText
-	jp StdBattleTextBox
+	jp StdBattleTextbox

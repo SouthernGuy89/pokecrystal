@@ -6,7 +6,7 @@ BattleCommand_Spite:
 	jp nz, .failed
 	ld bc, PARTYMON_STRUCT_LENGTH ; ????
 	ld hl, wEnemyMonMoves
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .got_moves
 	ld hl, wBattleMonMoves
@@ -63,7 +63,7 @@ BattleCommand_Spite:
 	call GetBattleVar
 	bit SUBSTATUS_TRANSFORMED, a
 	jr nz, .transformed
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr nz, .not_wildmon
 	ld a, [wBattleMode]
@@ -80,7 +80,7 @@ BattleCommand_Spite:
 	ld a, d
 	ld [wDeciramBuffer], a
 	ld hl, SpiteEffectText
-	jp StdBattleTextBox
+	jp StdBattleTextbox
 
 .failed
 	jp PrintDidntAffect2

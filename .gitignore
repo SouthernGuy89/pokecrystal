@@ -17,6 +17,9 @@
 *.sgm
 *.sav
 *.rtc
+*.sn*
+*.sa*
+*.sg1
 
 # rgbds extras
 *.map
@@ -33,14 +36,16 @@ pokecrystal.txt
 .*.swp
 # swap files for gedit
 *~
+# osx files
+.DS_STORE
 
 *.dimensions
 *.gbcpal
 *.2bpp
 *.1bpp
 *.lz
-*.pal
 *.animated.tilemap
 gfx/pokemon/*/bitmask.asm
 gfx/pokemon/*/frames.asm
-!gfx/pokemon/*/shiny.pal
+!gfx/pokemon/unown/bitmask.asm
+!gfx/pokemon/unown/frames.asm

@@ -2,7 +2,7 @@ BattleCommand_Spikes:
 ; spikes
 
 	ld hl, wEnemyScreens
-	ld a, [hBattleTurn]
+	ldh a, [hBattleTurn]
 	and a
 	jr z, .asm_3768e
 	ld hl, wPlayerScreens
@@ -20,7 +20,7 @@ BattleCommand_Spikes:
 	call AnimateCurrentMove
 
 	ld hl, SpikesText
-	jp StdBattleTextBox
+	jp StdBattleTextbox
 
 .failed
 	jp FailMove

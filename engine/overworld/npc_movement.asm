@@ -114,7 +114,10 @@ WillObjectBumpIntoTile:
 	ret
 
 .data_6f5b
-	db DOWN_MASK, UP_MASK, RIGHT_MASK, LEFT_MASK
+	db DOWN_MASK  ; DOWN
+	db UP_MASK    ; UP
+	db RIGHT_MASK ; LEFT
+	db LEFT_MASK  ; RIGHT
 
 Function6f5f:
 	ld hl, OBJECT_STANDING_TILE
@@ -137,19 +140,22 @@ Function6f5f:
 	ret
 
 .data_6f7b
-	db UP_MASK, DOWN_MASK, LEFT_MASK, RIGHT_MASK
+	db UP_MASK    ; DOWN
+	db DOWN_MASK  ; UP
+	db LEFT_MASK  ; LEFT
+	db RIGHT_MASK ; RIGHT
 
 Function6f7f:
 	ld d, a
 	and $f0
 	cp HI_NYBBLE_SIDE_WALLS
-	jr z, .done
-	cp HI_NYBBLE_UNUSED_C0
-	jr z, .done
+	jr z, .continue
+	cp HI_NYBBLE_SIDE_BUOYS
+	jr z, .continue
 	xor a
 	ret
 
-.done
+.continue
 	ld a, d
 	and 7
 	ld e, a
@@ -161,8 +167,14 @@ Function6f7f:
 	ret
 
 .data_6f99
-	db  8, 4, 1, 2
-	db 10, 6, 9, 5
+	db RIGHT_MASK             ; COLL_RIGHT_WALL/BUOY
+	db LEFT_MASK              ; COLL_LEFT_WALL/BUOY
+	db DOWN_MASK              ; COLL_UP_WALL/BUOY
+	db UP_MASK                ; COLL_DOWN_WALL/BUOY
+	db UP_MASK | RIGHT_MASK   ; COLL_DOWN_RIGHT_WALL/BUOY
+	db UP_MASK | LEFT_MASK    ; COLL_DOWN_LEFT_WALL/BUOY
+	db DOWN_MASK | RIGHT_MASK ; COLL_UP_RIGHT_WALL/BUOY
+	db DOWN_MASK | LEFT_MASK  ; COLL_UP_LEFT_WALL/BUOY
 
 Function6fa1:
 	ld hl, OBJECT_DIRECTION_WALKING
@@ -238,7 +250,7 @@ CheckFacingObject::
 .asm_6ff1
 	ld bc, wObjectStructs ; redundant
 	ld a, 0
-	ld [hMapObjectIndexBuffer], a
+	ldh [hMapObjectIndexBuffer], a
 	call IsNPCAtCoord
 	ret nc
 	ld hl, OBJECT_DIRECTION_WALKING
@@ -263,7 +275,7 @@ WillObjectBumpIntoSomeoneElse:
 	jr IsNPCAtCoord
 
 Unreferenced_Function7015:
-	ld a, [hMapObjectIndexBuffer]
+	ldh a, [hMapObjectIndexBuffer]
 	call GetObjectStruct
 	call .CheckWillBeFacingNPC
 	call IsNPCAtCoord
@@ -302,7 +314,7 @@ IsNPCAtCoord:
 	ld bc, wObjectStructs
 	xor a
 .loop
-	ld [hObjectStructIndexBuffer], a
+	ldh [hObjectStructIndexBuffer], a
 	call DoesObjectHaveASprite
 	jr z, .next
 
@@ -333,9 +345,9 @@ IsNPCAtCoord:
 	jr nz, .ok
 
 .ok2
-	ld a, [hMapObjectIndexBuffer]
+	ldh a, [hMapObjectIndexBuffer]
 	ld l, a
-	ld a, [hObjectStructIndexBuffer]
+	ldh a, [hObjectStructIndexBuffer]
 	cp l
 	jr nz, .setcarry
 
@@ -350,18 +362,18 @@ IsNPCAtCoord:
 	ld a, [hl]
 	cp e
 	jr nz, .next
-	ld a, [hMapObjectIndexBuffer]
+	ldh a, [hMapObjectIndexBuffer]
 	ld l, a
-	ld a, [hObjectStructIndexBuffer]
+	ldh a, [hObjectStructIndexBuffer]
 	cp l
 	jr nz, .setcarry
 
 .next
-	ld hl, OBJECT_STRUCT_LENGTH
+	ld hl, OBJECT_LENGTH
 	add hl, bc
 	ld b, h
 	ld c, l
-	ld a, [hObjectStructIndexBuffer]
+	ldh a, [hObjectStructIndexBuffer]
 	inc a
 	cp NUM_OBJECT_STRUCTS
 	jr nz, .loop
@@ -469,7 +481,7 @@ Unreferenced_Function7113:
 	ld bc, wObjectStructs
 	xor a
 .loop
-	ld [hObjectStructIndexBuffer], a
+	ldh [hObjectStructIndexBuffer], a
 	call DoesObjectHaveASprite
 	jr z, .next
 	ld hl, OBJECT_MOVEMENTTYPE
@@ -492,8 +504,8 @@ Unreferenced_Function7113:
 	ld a, [hl]
 	cp d
 	jr nz, .check_current_coords
-	ld a, [hObjectStructIndexBuffer]
-	cp $0
+	ldh a, [hObjectStructIndexBuffer]
+	cp PLAYER_OBJECT
 	jr z, .next
 	jr .yes
 
@@ -511,11 +523,11 @@ Unreferenced_Function7113:
 	jr .yes
 
 .next
-	ld hl, OBJECT_STRUCT_LENGTH
+	ld hl, OBJECT_LENGTH
 	add hl, bc
 	ld b, h
 	ld c, l
-	ld a, [hObjectStructIndexBuffer]
+	ldh a, [hObjectStructIndexBuffer]
 	inc a
 	cp NUM_OBJECT_STRUCTS
 	jr nz, .loop

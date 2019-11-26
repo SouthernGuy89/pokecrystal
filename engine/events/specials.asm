@@ -84,7 +84,7 @@ FoundNone:
 	ret
 
 NameRival:
-	ld b, $2 ; rival
+	ld b, NAME_RIVAL
 	ld de, wRivalName
 	farcall _NamingScreen
 	; default to "SILVER"
@@ -168,9 +168,8 @@ GetMysteryGiftItem:
 	ret
 
 .ReceiveItemText:
-	; received item
-	text_jump UnknownText_0x1bd3be
-	db "@"
+	text_far _ReceiveItemText
+	text_end
 
 BugContestJudging:
 	farcall _BugContestJudging
@@ -256,14 +255,12 @@ CheckCoinsAndCoinCase:
 	ret
 
 .NoCoinsText:
-	; You have no coins.
-	text_jump UnknownText_0x1bd3d7
-	db "@"
+	text_far _NoCoinsText
+	text_end
 
 .NoCoinCaseText:
-	; You don't have a COIN CASE.
-	text_jump UnknownText_0x1bd3eb
-	db "@"
+	text_far _NoCoinCaseText
+	text_end
 
 ClearBGPalettesBufferScreen:
 	call ClearBGPalettes
@@ -380,11 +377,11 @@ PlayCurMonCry:
 	jp PlayMonCry
 
 GameboyCheck:
-	ld a, [hCGB]
+	ldh a, [hCGB]
 	and a
 	jr nz, .cgb
 
-	ld a, [hSGB]
+	ldh a, [hSGB]
 	and a
 	jr nz, .sgb
 

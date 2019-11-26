@@ -1,15 +1,4 @@
-ifeq (,$(shell which sha1sum))
-SHA1 := shasum
-else
-SHA1 := sha1sum
-endif
-
-RGBASM := rgbasm
-RGBFIX := rgbfix
-RGBGFX := rgbgfx
-RGBLINK := rgblink
-
-roms := pokecrystal.gbc pokecrystal11.gbc
+roms := pokecrystal.gbc pokecrystal11.gbc pokecrystal-au.gbc
 
 crystal_obj := \
 audio.o \
@@ -25,15 +14,32 @@ engine/movie/credits.o \
 engine/overworld/events.o \
 gfx/pics.o \
 gfx/sprites.o \
+gfx/tilesets.o \
 lib/mobile/main.o
 
 crystal11_obj := $(crystal_obj:.o=11.o)
+crystal_au_obj := $(crystal_obj:.o=_au.o)
+
+
+### Build tools
+
+ifeq (,$(shell which sha1sum))
+SHA1 := shasum
+else
+SHA1 := sha1sum
+endif
+
+RGBDS ?=
+RGBASM  ?= $(RGBDS)rgbasm
+RGBFIX  ?= $(RGBDS)rgbfix
+RGBGFX  ?= $(RGBDS)rgbgfx
+RGBLINK ?= $(RGBDS)rgblink
 
 
 ### Build targets
 
 .SUFFIXES:
-.PHONY: all crystal crystal11 clean compare tools
+.PHONY: all crystal crystal11 crystal_au clean tidy compare tools
 .SECONDEXPANSION:
 .PRECIOUS:
 .SECONDARY:
@@ -41,9 +47,16 @@ crystal11_obj := $(crystal_obj:.o=11.o)
 all: crystal
 crystal: pokecrystal.gbc
 crystal11: pokecrystal11.gbc
+crystal-au: pokecrystal-au.gbc
 
 clean:
-	rm -f $(roms) $(crystal_obj) $(crystal11_obj) $(roms:.gbc=.map) $(roms:.gbc=.sym)
+	rm -f $(roms) $(crystal_obj) $(crystal11_obj) $(crystal_au_obj) $(roms:.gbc=.map) $(roms:.gbc=.sym)
+	find gfx \( -name "*.[12]bpp" -o -name "*.lz" -o -name "*.gbcpal" \) -delete
+	find gfx/pokemon -mindepth 1 ! -path "gfx/pokemon/unown/*" \( -name "bitmask.asm" -o -name "frames.asm" -o -name "front.animated.tilemap" -o -name "front.dimensions" \) -delete
+	$(MAKE) clean -C tools/
+
+tidy:
+	rm -f $(roms) $(crystal_obj) $(crystal11_obj) $(crystal_au_obj) $(roms:.gbc=.map) $(roms:.gbc=.sym)
 	$(MAKE) clean -C tools/
 
 compare: $(roms)
@@ -53,15 +66,16 @@ tools:
 	$(MAKE) -C tools/
 
 
-$(crystal_obj):   RGBASMFLAGS = -D _CRYSTAL
-$(crystal11_obj): RGBASMFLAGS = -D _CRYSTAL -D _CRYSTAL11
+$(crystal_obj):   RGBASMFLAGS =
+$(crystal11_obj): RGBASMFLAGS = -D _CRYSTAL11
+$(crystal_au_obj): RGBASMFLAGS = -D _CRYSTAL11 -D _CRYSTAL_AU
 
 # The dep rules have to be explicit or else missing files won't be reported.
 # As a side effect, they're evaluated immediately instead of when the rule is invoked.
 # It doesn't look like $(shell) can be deferred so there might not be a better way.
 define DEP
 $1: $2 $$(shell tools/scan_includes $2)
-	$$(RGBASM) $$(RGBASMFLAGS) -o $$@ $$<
+	$$(RGBASM) $$(RGBASMFLAGS) -L -o $$@ $$<
 endef
 
 # Build tools when building the rom.
@@ -70,6 +84,7 @@ ifeq (,$(filter clean tools,$(MAKECMDGOALS)))
 
 $(info $(shell $(MAKE) -C tools))
 
+$(foreach obj, $(crystal_au_obj), $(eval $(call DEP,$(obj),$(obj:_au.o=.asm))))
 $(foreach obj, $(crystal11_obj), $(eval $(call DEP,$(obj),$(obj:11.o=.asm))))
 $(foreach obj, $(crystal_obj), $(eval $(call DEP,$(obj),$(obj:.o=.asm))))
 
@@ -86,6 +101,11 @@ pokecrystal11.gbc: $(crystal11_obj) pokecrystal.link
 	$(RGBFIX) -Cjv -i BYTE -k 01 -l 0x33 -m 0x10 -n 1 -p 0 -r 3 -t PM_CRYSTAL $@
 	tools/sort_symfile.sh pokecrystal11.sym
 
+pokecrystal-au.gbc: $(crystal_au_obj) pokecrystal.link
+	$(RGBLINK) -n pokecrystal-au.sym -m pokecrystal-au.map -l pokecrystal.link -o $@ $(crystal_au_obj)
+	$(RGBFIX) -Cjv -i BYTU -k 01 -l 0x33 -m 0x10 -p 0 -r 3 -t PM_CRYSTAL $@
+	tools/sort_symfile.sh pokecrystal-au.sym
+
 
 # For files that the compressor can't match, there will be a .lz file suffixed with the md5 hash of the correct uncompressed file.
 # If the hash of the uncompressed file matches, use this .lz instead.
@@ -97,6 +117,18 @@ pokecrystal11.gbc: $(crystal11_obj) pokecrystal.link
 	$(if $(wildcard $(filename)),\
 		cp $(filename) $@,\
 		tools/lzcomp -- $< $@)
+
+
+### Pokemon pic animation rules
+
+gfx/pokemon/%/front.animated.2bpp: gfx/pokemon/%/front.2bpp gfx/pokemon/%/front.dimensions
+	tools/pokemon_animation_graphics -o $@ $^
+gfx/pokemon/%/front.animated.tilemap: gfx/pokemon/%/front.2bpp gfx/pokemon/%/front.dimensions
+	tools/pokemon_animation_graphics -t $@ $^
+gfx/pokemon/%/bitmask.asm: gfx/pokemon/%/front.animated.tilemap gfx/pokemon/%/front.dimensions
+	tools/pokemon_animation -b $^ > $@
+gfx/pokemon/%/frames.asm: gfx/pokemon/%/front.animated.tilemap gfx/pokemon/%/front.dimensions
+	tools/pokemon_animation -f $^ > $@
 
 
 ### Terrible hacks to match animations. Delete these rules if you don't care about matching.
@@ -119,36 +151,14 @@ gfx/pokemon/girafarig/front.animated.tilemap: gfx/pokemon/girafarig/front.2bpp g
 	tools/pokemon_animation_graphics --girafarig -t $@ $^
 
 
-### Pokemon pic graphics rules
-
-gfx/pokemon/%/front.dimensions: gfx/pokemon/%/front.png
-	tools/png_dimensions $< $@
-gfx/pokemon/%/normal.pal: gfx/pokemon/%/normal.gbcpal
-	tools/palette -p $< > $@
-gfx/pokemon/%/normal.gbcpal: gfx/pokemon/%/front.png
-	$(RGBGFX) -p $@ $<
-gfx/pokemon/%/back.2bpp: gfx/pokemon/%/back.png
-	$(RGBGFX) -h -o $@ $<
-gfx/pokemon/%/bitmask.asm: gfx/pokemon/%/front.animated.tilemap gfx/pokemon/%/front.dimensions
-	tools/pokemon_animation -b $^ > $@
-gfx/pokemon/%/frames.asm: gfx/pokemon/%/front.animated.tilemap gfx/pokemon/%/front.dimensions
-	tools/pokemon_animation -f $^ > $@
-gfx/pokemon/%/front.animated.2bpp: gfx/pokemon/%/front.2bpp gfx/pokemon/%/front.dimensions
-	tools/pokemon_animation_graphics -o $@ $^
-gfx/pokemon/%/front.animated.tilemap: gfx/pokemon/%/front.2bpp gfx/pokemon/%/front.dimensions
-	tools/pokemon_animation_graphics -t $@ $^
-
-
 ### Misc file-specific graphics rules
+
+gfx/pokemon/%/back.2bpp: rgbgfx += -h
+
+gfx/trainers/%.2bpp: rgbgfx += -h
 
 gfx/new_game/shrink1.2bpp: rgbgfx += -h
 gfx/new_game/shrink2.2bpp: rgbgfx += -h
-
-gfx/trainers/%.2bpp: rgbgfx += -h
-gfx/trainers/%.pal: gfx/trainers/%.gbcpal
-	tools/palette -p $< > $@
-gfx/trainers/%.gbcpal: gfx/trainers/%.png
-	$(RGBGFX) -p $@ $<
 
 gfx/mail/dragonite.1bpp: tools/gfx += --remove-whitespace
 gfx/mail/large_note.1bpp: tools/gfx += --remove-whitespace
@@ -157,6 +167,7 @@ gfx/mail/flower_mail_border.1bpp: tools/gfx += --remove-whitespace
 gfx/mail/litebluemail_border.1bpp: tools/gfx += --remove-whitespace
 
 gfx/pokedex/pokedex.2bpp: tools/gfx += --trim-whitespace
+gfx/pokedex/question_mark.2bpp: rgbgfx += -h
 gfx/pokedex/sgb.2bpp: tools/gfx += --trim-whitespace
 gfx/pokedex/slowpoke.2bpp: tools/gfx += --trim-whitespace
 
@@ -172,6 +183,7 @@ gfx/title/logo.2bpp: rgbgfx += -x 4
 gfx/trade/ball.2bpp: tools/gfx += --remove-whitespace
 gfx/trade/game_boy_n64.2bpp: tools/gfx += --trim-whitespace
 
+gfx/slots/slots_1.2bpp: tools/gfx += --trim-whitespace
 gfx/slots/slots_2.2bpp: tools/gfx += --interleave --png=$<
 gfx/slots/slots_3.2bpp: tools/gfx += --interleave --png=$< --remove-duplicates --keep-whitespace --remove-xflip
 
@@ -225,9 +237,6 @@ gfx/unknown/unknown_egg.2bpp: rgbgfx += -h
 
 ### Catch-all graphics rules
 
-%.bin: ;
-%.blk: ;
-
 %.2bpp: %.png
 	$(RGBGFX) $(rgbgfx) -o $@ $<
 	$(if $(tools/gfx),\
@@ -240,5 +249,6 @@ gfx/unknown/unknown_egg.2bpp: rgbgfx += -h
 
 %.gbcpal: %.png
 	$(RGBGFX) -p $@ $<
+
 %.dimensions: %.png
 	tools/png_dimensions $< $@

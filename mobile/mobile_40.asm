@@ -1,13 +1,11 @@
-SECTION "mobile_40", ROMX
-
 Function100000:
 ; d: 1 or 2
 ; e: bank
 ; bc: addr
-	ld a, [rSVBK]
+	ldh a, [rSVBK]
 	push af
 	ld a, 1
-	ld [rSVBK], a
+	ldh [rSVBK], a
 
 	call Function100022
 	call Function1000ba
@@ -21,7 +19,7 @@ Function100000:
 	pop bc
 
 	pop af
-	ld [rSVBK], a
+	ldh [rSVBK], a
 	ret
 
 Function100022:
@@ -59,14 +57,14 @@ SetRAMStateForMobile:
 	ld bc, $65
 	call ByteFill
 	xor a
-	ld hl, wc300
-	ld bc, $100
+	ld hl, wMobileWRAM
+	ld bc, wMobileWRAMEnd - wMobileWRAM
 	call ByteFill
-	ld a, [rIE]
+	ldh a, [rIE]
 	ld [wBGMapBuffer], a
 	xor a
-	ld [hMapAnims], a
-	ld [hLCDCPointer], a
+	ldh [hMapAnims], a
+	ldh [hLCDCPointer], a
 	ret
 
 EnableMobile:
@@ -78,15 +76,15 @@ EnableMobile:
 	di
 	call DoubleSpeed
 	xor a
-	ld [rIF], a
-	ld a, 1 << VBLANK | 1 << LCD_STAT | 1 << TIMER | 1 << SERIAL
-	ld [rIE], a
+	ldh [rIF], a
+	ld a, IE_DEFAULT
+	ldh [rIE], a
 	xor a
-	ld [hMapAnims], a
-	ld [hLCDCPointer], a
+	ldh [hMapAnims], a
+	ldh [hLCDCPointer], a
 	ld a, $01
-	ld [hMobileReceive], a
-	ld [hMobile], a
+	ldh [hMobileReceive], a
+	ldh [hMobile], a
 	ei
 
 	ret
@@ -94,15 +92,15 @@ EnableMobile:
 DisableMobile:
 	di
 	xor a
-	ld [hMobileReceive], a
-	ld [hMobile], a
+	ldh [hMobileReceive], a
+	ldh [hMobile], a
 	xor a
-	ld [hVBlank], a
+	ldh [hVBlank], a
 	call NormalSpeed
 	xor a
-	ld [rIF], a
+	ldh [rIF], a
 	ld a, [wBGMapBuffer]
-	ld [rIE], a
+	ldh [rIE], a
 	ei
 	ret
 
@@ -160,13 +158,13 @@ Function1000fa:
 .asm_100117
 	di
 	xor a
-	ld [rIF], a
-	ld a, [rIE]
-	and $13
-	ld [rIE], a
+	ldh [rIF], a
+	ldh a, [rIE]
+	and $1f ^ (1 << SERIAL | 1 << TIMER)
+	ldh [rIE], a
 	xor a
-	ld [hMobileReceive], a
-	ld [hMobile], a
+	ldh [hMobileReceive], a
+	ldh [hMobile], a
 	ei
 
 	ld a, [wLinkMode]
@@ -272,11 +270,11 @@ Function10016f:
 	ld de, 0
 
 .asm_1001d7
-	ld [wc300], a
+	ld [wMobileErrorCodeBuffer], a
 	ld a, d
-	ld [wc302], a
+	ld [wMobileErrorCodeBuffer + 2], a
 	ld a, e
-	ld [wc301], a
+	ld [wMobileErrorCodeBuffer + 1], a
 	call Function10020b
 	ret
 
@@ -295,11 +293,11 @@ Function10016f:
 
 .asm_1001f5
 	ld a, [wcd2c]
-	ld [wc300], a
+	ld [wMobileErrorCodeBuffer], a
 	ld a, [wcd2d]
-	ld [wc302], a
+	ld [wMobileErrorCodeBuffer + 2], a
 	ld a, [wcd2d]
-	ld [wc301], a
+	ld [wMobileErrorCodeBuffer + 1], a
 	call Function10020b
 	ret
 
@@ -311,15 +309,15 @@ Function10020b:
 	call HideSprites
 	call DelayFrame
 
-	ld a, [rSVBK]
+	ldh a, [rSVBK]
 	push af
 	ld a, $01
-	ld [rSVBK], a
+	ldh [rSVBK], a
 
 	farcall DisplayMobileError
 
 	pop af
-	ld [rSVBK], a
+	ldh [rSVBK], a
 	ret
 
 Function100232:
@@ -401,10 +399,10 @@ Function1002c9:
 
 Function1002dc:
 	ld a, MAPSETUP_LINKRETURN
-	ld [hMapEntryMethod], a
+	ldh [hMapEntryMethod], a
 	farcall RunMapSetupScript
 	xor a
-	ld [hMapEntryMethod], a
+	ldh [hMapEntryMethod], a
 	call LoadStandardFont
 	ret
 
@@ -412,7 +410,7 @@ Function1002ed:
 	farcall LoadOW_BGPal7
 	farcall ApplyPals
 	ld a, $01
-	ld [hCGBPalUpdate], a
+	ldh [hCGBPalUpdate], a
 	call DelayFrame
 	ret
 
@@ -686,7 +684,7 @@ Function100493:
 Function100495:
 	jr asm_100497
 
-asm_100497
+asm_100497:
 	call Function100337
 	ret c
 	ret z
@@ -989,11 +987,11 @@ IncrementMobileInactivityTimerByCFrames:
 Function100665:
 	call UpdateTime
 	ld hl, wcd36
-	ld a, [hHours]
+	ldh a, [hHours]
 	ld [hli], a
-	ld a, [hMinutes]
+	ldh a, [hMinutes]
 	ld [hli], a
-	ld a, [hSeconds]
+	ldh a, [hSeconds]
 	ld [hl], a
 	ret
 
@@ -1062,7 +1060,7 @@ Function1006d3:
 Function1006dc:
 	ld a, [hld]
 	ld c, a
-	ld a, [hSeconds]
+	ldh a, [hSeconds]
 	sub c
 	jr nc, .asm_1006e5
 	add $3c
@@ -1072,7 +1070,7 @@ Function1006dc:
 	dec de
 	ld a, [hld]
 	ld c, a
-	ld a, [hMinutes]
+	ldh a, [hMinutes]
 	sbc c
 	jr nc, .asm_1006f0
 	add $3c
@@ -1082,7 +1080,7 @@ Function1006dc:
 	dec de
 	ld a, [hl]
 	ld c, a
-	ld a, [hHours]
+	ldh a, [hHours]
 	sbc c
 	jr nc, .asm_1006fb
 	add $18
@@ -1102,13 +1100,13 @@ Function1006fd:
 	call CloseSRAM
 	ret
 
-Function10070d:
-	ld a, $04
-	ld hl, $a800
+MobileBattleFixTimer:
+	ld a, BANK(sMobileBattleTimer)
+	ld hl, sMobileBattleTimer
 	call GetSRAMBank
-	xor a
+	xor a ; MOBILE_BATTLE_ALLOWED_SECONDS
 	ld [hli], a
-	ld a, $0a
+	ld a, MOBILE_BATTLE_ALLOWED_MINUTES
 	ld [hli], a
 	xor a
 	ld [hli], a
@@ -1119,14 +1117,14 @@ Function100720:
 	xor a
 	ld [wcd6a], a
 	call UpdateTime
-	ld a, [hHours]
+	ldh a, [hHours]
 	ld [wcd72], a
-	ld a, [hMinutes]
+	ldh a, [hMinutes]
 	ld [wcd73], a
-	ld a, [hSeconds]
+	ldh a, [hSeconds]
 	ld [wcd74], a
-	ld a, $04
-	ld hl, $a800
+	ld a, BANK(sMobileBattleTimer)
+	ld hl, sMobileBattleTimer
 	call GetSRAMBank
 	ld a, [hli]
 	ld [wcd6c], a
@@ -1141,11 +1139,11 @@ Function100720:
 
 Function100754:
 	call UpdateTime
-	ld a, [hHours]
+	ldh a, [hHours]
 	ld [wcd72], a
-	ld a, [hMinutes]
+	ldh a, [hMinutes]
 	ld [wcd73], a
-	ld a, [hSeconds]
+	ldh a, [hSeconds]
 	ld [wcd74], a
 	ld a, [wcd6d]
 	ld [wcd6b], a
@@ -1256,11 +1254,11 @@ Function1007f6:
 	call CloseSRAM
 	ld hl, wcd6e
 	call Function100826
-	ld a, [hHours]
+	ldh a, [hHours]
 	ld [wcd72], a
-	ld a, [hMinutes]
+	ldh a, [hMinutes]
 	ld [wcd73], a
-	ld a, [hSeconds]
+	ldh a, [hSeconds]
 	ld [wcd74], a
 	ret
 
@@ -1335,9 +1333,11 @@ String_10088e:
 String_10089f:
 	db "　むせいげん@"
 
-Function1008a6:
-	ld a, $04
-	ld hl, $a800
+MobileBattleGetRemainingTime:
+; Calculates the difference between 10 minutes and sMobileBattleTimer
+; Returns minutes in c and seconds in b
+	ld a, BANK(sMobileBattleTimer)
+	ld hl, sMobileBattleTimer
 	call GetSRAMBank
 	ld a, [hli]
 	ld [wStringBuffer2], a
@@ -1348,55 +1348,54 @@ Function1008a6:
 	call CloseSRAM
 	ld a, [wStringBuffer2 + 2]
 	ld b, a
-	ld a, 0
+	ld a, MOBILE_BATTLE_ALLOWED_SECONDS
 	sub b
-	jr nc, .asm_1008c8
-	add $3c
-
-.asm_1008c8
+	jr nc, .no_carry_seconds
+	add 60
+.no_carry_seconds
 	ld b, a
 	ld a, [wStringBuffer2 + 1]
 	ld c, a
-	ld a, $0a
+	ld a, MOBILE_BATTLE_ALLOWED_MINUTES
 	sbc c
 	ld c, a
-	jr c, .asm_1008da
+	jr c, .fail
 	ld a, [wStringBuffer2]
 	and a
-	jr nz, .asm_1008da
+	jr nz, .fail
 	ret
 
-.asm_1008da
-	call Function10070d
+.fail
+	call MobileBattleFixTimer
 	ld c, 0
 	ret
 
 Function1008e0:
-	ld a, [hBGMapMode]
+	ldh a, [hBGMapMode]
 	ld b, a
-	ld a, [hVBlank]
+	ldh a, [hVBlank]
 	ld c, a
 	push bc
 	xor a
-	ld [hBGMapMode], a
+	ldh [hBGMapMode], a
 	ld a, $03
-	ld [hVBlank], a
+	ldh [hVBlank], a
 	call Function100970
 	call Function100902
 	call Function100989
 	call DelayFrame
 	pop bc
 	ld a, c
-	ld [hVBlank], a
+	ldh [hVBlank], a
 	ld a, b
-	ld [hBGMapMode], a
+	ldh [hBGMapMode], a
 	ret
 
 Function100902:
 	hlcoord 3, 10
 	ld b, $01
 	ld c, $0b
-	call TextBox
+	call Textbox
 	ld a, [wcd6d]
 	ld c, a
 	ld a, $0a
@@ -1462,10 +1461,10 @@ Function1009a5:
 	ret
 
 Function1009ae:
-	ld a, [rSVBK]
+	ldh a, [rSVBK]
 	push af
 	ld a, $03
-	ld [rSVBK], a
+	ldh [rSVBK], a
 
 	ld hl, w3_d800
 	decoord 0, 0, wAttrMap
@@ -1486,19 +1485,19 @@ Function1009ae:
 	jr nz, .loop_row
 
 	pop af
-	ld [rSVBK], a
+	ldh [rSVBK], a
 	ret
 
 Function1009d2:
-	ld a, [rSVBK]
+	ldh a, [rSVBK]
 	push af
 	ld a, $03
-	ld [rSVBK], a
+	ldh [rSVBK], a
 
-	ld a, [rVBK]
+	ldh a, [rVBK]
 	push af
 	ld a, $01
-	ld [rVBK], a
+	ldh [rVBK], a
 
 	ld hl, w3_d800
 	debgcoord 0, 0
@@ -1506,14 +1505,14 @@ Function1009d2:
 	call Get2bpp
 
 	pop af
-	ld [rVBK], a
+	ldh [rVBK], a
 
 	pop af
-	ld [rSVBK], a
+	ldh [rSVBK], a
 	ret
 
 Function1009f3:
-	ld a, [hJoyDown]
+	ldh a, [hJoyDown]
 	and SELECT + A_BUTTON
 	cp SELECT + A_BUTTON
 	jr nz, .select_a
@@ -1552,10 +1551,10 @@ _LinkBattleSendReceiveAction:
 	and a ; BATTLEPLAYERACTION_USEMOVE?
 	jr nz, .switch
 	ld a, [wCurPlayerMove]
-	ld b, BATTLEACTION_E
+	ld b, BATTLEACTION_STRUGGLE
 	cp STRUGGLE
 	jr z, .struggle
-	ld b, BATTLEACTION_D
+	ld b, BATTLEACTION_SKIPTURN
 	cp $ff
 	jr z, .struggle
 	ld a, [wCurMoveNum]
@@ -1682,16 +1681,13 @@ Function100ae7:
 	ld [wcd2b], a
 	ret
 
-
-SECTION "tetsuji", ROMX
-
-	charmap " ", $20 ; revert to ascii
+pushc
+setcharmap ascii
 
 Unknown_100b0a:
 	db "tetsuji", 0
 
-
-SECTION "bank40_2", ROMX
+popc
 
 Function100b12:
 	call Function100dd8
@@ -1768,7 +1764,7 @@ MobileMoveSelectionScreen:
 
 .GetMoveSelection:
 	xor a
-	ld [hBGMapMode], a
+	ldh [hBGMapMode], a
 	call Function100c74
 	call Function100c98
 .master_loop
@@ -1860,7 +1856,7 @@ MobileMoveSelectionScreen:
 	ld hl, BattleText_TheresNoPPLeftForThisMove
 
 .print_text
-	call StdBattleTextBox
+	call StdBattleTextbox
 	call Call_LoadTempTileMapToTileMap
 	jp .GetMoveSelection
 
@@ -1868,7 +1864,7 @@ Function100c74:
 	hlcoord 0, 8
 	ld b, 8
 	ld c, 8
-	call TextBox
+	call Textbox
 	ld hl, wBattleMonMoves
 	ld de, wListMoves_MoveIndicesBuffer
 	ld bc, NUM_MOVES
@@ -1923,7 +1919,7 @@ Mobile_PartyMenuSelect:
 	cp b
 	jr z, .done
 	ld [wPartyMenuCursor], a
-	ld a, [hJoyLast]
+	ldh a, [hJoyLast]
 	ld b, a
 	bit 1, b
 	jr nz, .done
@@ -1993,7 +1989,7 @@ Function100d67:
 	ld hl, .MenuHeader
 	call CopyMenuHeader
 	xor a
-	ld [hBGMapMode], a
+	ldh [hBGMapMode], a
 	call MenuBox
 	call UpdateSprites
 	call PlaceVerticalMenuItems
@@ -2215,7 +2211,7 @@ Function100eca:
 Function100ed4:
 	farcall ApplyPals
 	ld a, $01
-	ld [hCGBPalUpdate], a
+	ldh [hCGBPalUpdate], a
 	ret
 
 Function100edf:
@@ -2657,9 +2653,9 @@ LoadSelectedPartiesForColosseum:
 	ret
 
 Function1011f1:
-	ld a, $04
+	ld a, BANK(s4_a60c)
 	call GetSRAMBank
-	ld a, [$a60c]
+	ld a, [s4_a60c]
 	ld [wdc41], a
 	call CloseSRAM
 	ld hl, wdc41
@@ -2987,13 +2983,13 @@ Function101406:
 	and a
 	ret
 
-asm_101416
+asm_101416:
 	scf
 	ret
 
 Function101418:
 	call GetJoypad
-	ld a, [hJoyDown]
+	ldh a, [hJoyDown]
 	and SELECT + A_BUTTON
 	cp SELECT + A_BUTTON
 	jr z, .asm_101425
@@ -3088,7 +3084,7 @@ Function1014a6:
 
 Function1014b7:
 	call GetJoypad
-	ld a, [hJoyPressed]
+	ldh a, [hJoyPressed]
 	and $03
 	jr nz, .asm_1014c5
 	ld hl, wcd42
@@ -3280,46 +3276,46 @@ Function10162a:
 	ld [wMobileCommsJumptableIndex], a
 	ret
 
-Function101635:
-	ld de, wc608
+MobileCopyTransferData:
+	ld de, wMobileTransferData
 	ld bc, $1e0
 	call FarCopyWRAM
 	ret
 
-Function10163f:
-	ld hl, wc608
+MobileCopyTransferData2:
+	ld hl, wMobileTransferData
 	ld bc, $1e0
 	call FarCopyWRAM
 	ret
 
 Function101649:
-	ld a, $05
+	ld a, BANK(w5_d800)
 	ld hl, w5_d800
-	call Function101635
-	ld a, $05
+	call MobileCopyTransferData
+	ld a, BANK(w5_da00)
 	ld de, w5_da00
-	call Function10163f
+	call MobileCopyTransferData2
 	ret
 
 Function10165a:
-	ld a, $05
+	ld a, BANK(w5_da00)
 	ld hl, w5_da00
-	call Function101635
+	call MobileCopyTransferData
 	ret
 
 Function101663:
-	ld a, $05
+	ld a, BANK(w5_dc00)
 	ld hl, w5_d800
-	call Function101635
-	ld a, $05
+	call MobileCopyTransferData
+	ld a, BANK(w5_dc00)
 	ld de, w5_dc00
-	call Function10163f
+	call MobileCopyTransferData2
 	ret
 
 Unreferenced_Function101674:
-	ld a, $05
+	ld a, BANK(w5_dc00)
 	ld hl, w5_dc00
-	call Function101635
+	call MobileCopyTransferData
 	ret
 
 Function10167d:
@@ -3456,7 +3452,7 @@ Function10174c:
 	ld a, e
 	ld [wcd3b], a
 	ld a, d
-	ld [wcd3c], a
+	ld [wBattleTowerRoomMenu2JumptableIndex], a
 	ld a, c
 	ld [wcd40], a
 	ld a, b
@@ -3616,10 +3612,8 @@ Function101826:
 	ld [wcd2b], a
 	ret
 
-
-SECTION "ascii 10186f", ROMX
-
-	charmap " ", $20 ; revert to ascii
+pushc
+setcharmap ascii
 
 Unknown_10186f:
 	db .end - @
@@ -3636,8 +3630,7 @@ Unknown_101895:
 	db $19, $67, $10, $01, "limit_crystal"
 .end	db 0
 
-
-SECTION "bank40_3", ROMX
+popc
 
 Function1018a8:
 	ld hl, wccb5
@@ -3719,7 +3712,7 @@ Function101913:
 	ld hl, wcd29
 	res 7, [hl]
 	ld a, $90
-	ld [hWY], a
+	ldh [hWY], a
 	ld a, [wcd21]
 	cp $01
 	jr z, .asm_10193f
@@ -3788,7 +3781,7 @@ _StartMobileBattle:
 	ld [wdc5f], a
 	ld [wdc60], a
 	farcall BlankScreen
-	call SpeechTextBox
+	call SpeechTextbox
 	farcall Function100846
 	ld c, 120
 	call DelayFrames
@@ -3807,17 +3800,17 @@ _StartMobileBattle:
 	ret
 
 .CopyOTDetails:
-	ld a, [rSVBK]
+	ldh a, [rSVBK]
 	push af
 	ld a, 5
-	ld [rSVBK], a
+	ldh [rSVBK], a
 
 	ld bc, w5_dc0d
 	ld de, w5_dc11
 	farcall GetMobileOTTrainerClass
 
 	pop af
-	ld [rSVBK], a
+	ldh [rSVBK], a
 
 	ld a, c
 	ld [wOtherTrainerClass], a
@@ -3831,7 +3824,7 @@ _StartMobileBattle:
 	jr z, .got_link_player_number
 	ld a, USING_EXTERNAL_CLOCK
 .got_link_player_number
-	ld [hSerialConnectionStatus], a
+	ldh [hSerialConnectionStatus], a
 	ret
 
 StartMobileBattle:
@@ -3850,7 +3843,7 @@ StartMobileBattle:
 	xor a
 	ld [wDisableTextAcceleration], a
 	ld a, CONNECTION_NOT_ESTABLISHED
-	ld [hSerialConnectionStatus], a
+	ldh [hSerialConnectionStatus], a
 	pop af
 	ld [wOptions], a
 	ret
@@ -4741,14 +4734,14 @@ Function102142:
 	call Function10218d
 	call Function102180
 	ld hl, UnknownText_0x1021d1
-	call MenuTextBox
+	call MenuTextbox
 	ld de, SFX_LEVEL_UP
 	call PlaySFX
 	call JoyWaitAorB
 	call ExitMenu
 	call Function10219f
 	ld hl, UnknownText_0x1021d6
-	call MenuTextBox
+	call MenuTextbox
 	call YesNoBox
 	call ExitMenu
 	jr c, .asm_10217c
@@ -4802,34 +4795,34 @@ Function1021b8:
 	ret
 
 UnknownText_0x1021d1:
-	text_jump UnknownText_0x1bd19a
-	db "@"
+	text_far UnknownText_0x1bd19a
+	text_end
 
 UnknownText_0x1021d6:
-	text_jump UnknownText_0x1bd1ba
-	db "@"
+	text_far UnknownText_0x1bd1ba
+	text_end
 
 UnknownText_0x1021db:
-	text_jump UnknownText_0x1bd1dd
-	db "@"
+	text_far UnknownText_0x1bd1dd
+	text_end
 
 Function1021e0:
-	call MenuTextBox
+	call MenuTextbox
 	call JoyWaitAorB
 	call ExitMenu
 	ret
 
 UnknownText_0x1021ea:
-	text_jump UnknownText_0x1bd201
-	db "@"
+	text_far UnknownText_0x1bd201
+	text_end
 
 UnknownText_0x1021ef:
-	text_jump UnknownText_0x1bd211
-	db "@"
+	text_far UnknownText_0x1bd211
+	text_end
 
 UnknownText_0x1021f4:
-	text_jump UnknownText_0x1bd223
-	db "@"
+	text_far UnknownText_0x1bd223
+	text_end
 
 Function1021f9:
 	call Function102233
@@ -5239,7 +5232,7 @@ Function1024de:
 	ld hl, wcd4e
 	dec [hl]
 	jr z, .asm_1024e9
-	ld a, [hJoyPressed]
+	ldh a, [hJoyPressed]
 	and A_BUTTON | B_BUTTON
 	ret z
 
@@ -5528,7 +5521,7 @@ Function1026de:
 	ret
 
 Function1026f3:
-	ld a, [hJoyPressed]
+	ldh a, [hJoyPressed]
 	bit A_BUTTON_F, a
 	jr nz, .asm_102723
 	bit D_UP_F, a
@@ -5612,7 +5605,7 @@ Function102775:
 	ret
 
 Function10278c:
-	ld a, [hJoyPressed]
+	ldh a, [hJoyPressed]
 	bit A_BUTTON_F, a
 	jr nz, asm_1027c6
 	bit B_BUTTON_F, a
@@ -5637,7 +5630,7 @@ Function1027a0:
 	ret
 
 Function1027b7:
-	ld a, [hJoyPressed]
+	ldh a, [hJoyPressed]
 	bit A_BUTTON_F, a
 	jr nz, asm_1027d1
 	bit B_BUTTON_F, a
@@ -6472,7 +6465,7 @@ Function102e07:
 	ld a, [wBattleMode]
 	and a
 	jr z, .link_battle
-	call TextBox
+	call Textbox
 	jr .okay
 
 .link_battle
@@ -6535,7 +6528,7 @@ Function102e4f:
 	push de
 	push hl
 	ld a, c
-	ld [hDividend], a
+	ldh [hDividend], a
 	call GetPokemonName
 	pop hl
 	call PlaceString
@@ -6573,12 +6566,12 @@ Function102ea8:
 	ld [wNamedObjectIndexBuffer], a
 	call GetPokemonName
 	ld hl, UnknownText_0x102ee2
-	call PrintTextBoxText
+	call PrintTextboxText
 	ret
 
 UnknownText_0x102ee2:
-	text_jump UnknownText_0x1bd286
-	db "@"
+	text_far UnknownText_0x1bd286
+	text_end
 
 Function102ee7:
 	call Function102dc3
@@ -6717,12 +6710,12 @@ Function10305d:
 
 Function10306e:
 	ld a, $01
-	ld [hOAMUpdate], a
+	ldh [hOAMUpdate], a
 	call ClearSprites
 	ld de, wVirtualOAM
 	call Function1030cd
 	xor a
-	ld [hOAMUpdate], a
+	ldh [hOAMUpdate], a
 	ret
 
 Function10307f:
@@ -6928,15 +6921,15 @@ Function103302:
 
 Function103309:
 	xor a
-	ld [hBGMapMode], a
+	ldh [hBGMapMode], a
 	ld hl, wBuffer1
 	ld bc, 10
 	xor a
 	call ByteFill
-	ld a, $04
+	ld a, BANK(s4_a60c)
 	call GetSRAMBank
 	ld a, [wdc41]
-	ld [$a60c], a
+	ld [s4_a60c], a
 	ld [wBuffer1], a
 	call CloseSRAM
 	call Function1035c6
@@ -6985,10 +6978,10 @@ Function103362:
 	ld hl, wBuffer2
 	bit 6, [hl]
 	jr z, .asm_103398
-	ld a, $04
+	ld a, BANK(s4_a60c)
 	call GetSRAMBank
 	ld a, [wBuffer1]
-	ld [$a60c], a
+	ld [s4_a60c], a
 	ld [wdc41], a
 	call CloseSRAM
 	xor a
@@ -7014,7 +7007,7 @@ Function10339a:
 
 Function1033af:
 	call GetJoypad
-	ld a, [hJoyPressed]
+	ldh a, [hJoyPressed]
 	bit D_LEFT_F, a
 	jr nz, .left
 	bit D_RIGHT_F, a
@@ -7443,7 +7436,7 @@ Function103700:
 	ld hl, wSwarmFlags
 	bit SWARMFLAGS_MOBILE_4_F, [hl]
 	jr z, .asm_10370f
-	farcall Function1008a6
+	farcall MobileBattleGetRemainingTime
 
 .asm_10370f
 	ld a, c
@@ -7496,26 +7489,32 @@ MenuData_10374f:
 	db "せつめい@"
 
 UnknownText_0x10375d:
-	text_jump UnknownText_0x1c422a
-	db "@"
+	text_far UnknownText_0x1c422a
+	text_end
+
 UnknownText_0x103762:
-	text_jump UnknownText_0x1c4275
-	db "@"
+	text_far UnknownText_0x1c4275
+	text_end
+
 UnknownText_0x103767:
-	text_jump UnknownText_0x1c4298
-	db "@"
+	text_far UnknownText_0x1c4298
+	text_end
+
 UnknownText_0x10376c:
-	text_jump UnknownText_0x1c439c
-	db "@"
+	text_far UnknownText_0x1c439c
+	text_end
+
 UnknownText_0x103771:
-	text_jump UnknownText_0x1c43dc
-	db "@"
+	text_far UnknownText_0x1c43dc
+	text_end
+
 UnknownText_0x103776:
-	text_jump UnknownText_0x1c4419
-	db "@"
+	text_far UnknownText_0x1c4419
+	text_end
+
 UnknownText_0x10377b:
-	text_jump UnknownText_0x1c445a
-	db "@"
+	text_far UnknownText_0x1c445a
+	text_end
 
 Function103780:
 	ld a, [wChosenCableClubRoom]
@@ -7558,7 +7557,7 @@ Function10378c:
 	ret
 
 Function1037c2:
-	call Function103823
+	call MobileCheckRemainingBattleTime
 	jr c, .nope
 	ld a, [wdc5f]
 	and a
@@ -7578,16 +7577,16 @@ Function1037c2:
 	ret
 
 UnknownText_0x1037e6:
-	text_jump UnknownText_0x1c449c
-	db "@"
+	text_far UnknownText_0x1c449c
+	text_end
 
 Function1037eb:
-	call Function103823
+	call MobileCheckRemainingBattleTime
 	jr nc, .asm_103807
-	ld hl, UnknownText_0x103819
+	ld hl, MobileBattleLessThanOneMinuteLeftText
 	call PrintText
 	call JoyWaitAorB
-	ld hl, UnknownText_0x10381e
+	ld hl, MobileBattleNoTimeLeftForLinkingText
 	call PrintText
 	call JoyWaitAorB
 	xor a
@@ -7607,28 +7606,29 @@ Function1037eb:
 	ld [wScriptVar], a
 	ret
 
-UnknownText_0x103819:
-	text_jump UnknownText_0x1c44c0
-	db "@"
+MobileBattleLessThanOneMinuteLeftText:
+	text_far _MobileBattleLessThanOneMinuteLeftText
+	text_end
 
-UnknownText_0x10381e:
-	text_jump UnknownText_0x1c44e7
-	db "@"
+MobileBattleNoTimeLeftForLinkingText:
+	text_far _MobileBattleNoTimeLeftForLinkingText
+	text_end
 
-Function103823:
+MobileCheckRemainingBattleTime:
+; Returns carry if less than one minute remains
 	farcall Mobile_AlwaysReturnNotCarry
 	bit 7, c
-	jr nz, .asm_103838
-	farcall Function1008a6
+	jr nz, .ok
+	farcall MobileBattleGetRemainingTime
 	ld a, c
-	cp $01
-	jr c, .asm_10383a
+	cp 1
+	jr c, .fail
 
-.asm_103838
+.ok
 	xor a
 	ret
 
-.asm_10383a
+.fail
 	scf
 	ret
 
@@ -7660,14 +7660,14 @@ Function10383c:
 	ret
 
 UnknownText_0x103876:
-	text_jump UnknownText_0x1c4508
-	db "@"
+	text_far UnknownText_0x1c4508
+	text_end
 
 Function10387b:
 	farcall Mobile_AlwaysReturnNotCarry
 	bit 7, c
 	ret nz
-	farcall Function1008a6
+	farcall MobileBattleGetRemainingTime
 	ld a, c
 	ld [wStringBuffer2], a
 	ld hl, UnknownText_0x103898
@@ -7676,5 +7676,5 @@ Function10387b:
 	ret
 
 UnknownText_0x103898:
-	text_jump UnknownText_0x1c4525
-	db "@"
+	text_far UnknownText_0x1c4525
+	text_end

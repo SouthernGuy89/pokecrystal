@@ -70,12 +70,12 @@ BuenaPrize:
 	ld [wMenuSelection], a
 	call Buena_PlacePrizeMenuBox
 	call Buena_DisplayBlueCardBalance
-	ld hl, .Text_AskWhichPrize
+	ld hl, .BuenaAskWhichPrizeText
 	call PrintText
 	jr .okay
 
 .loop
-	ld hl, .Text_AskWhichPrize
+	ld hl, .BuenaAskWhichPrizeText
 	call BuenaPrintText
 
 .okay
@@ -89,7 +89,7 @@ BuenaPrize:
 	ld a, [hl]
 	ld [wNamedObjectIndexBuffer], a
 	call GetItemName
-	ld hl, .Text_IsThatRight
+	ld hl, .BuenaIsThatRightText
 	call BuenaPrintText
 	call YesNoBox
 	jr c, .loop
@@ -121,17 +121,17 @@ BuenaPrize:
 	jr .Purchase
 
 .InsufficientBalance:
-	ld hl, .Text_NotEnoughPoints
+	ld hl, .BuenaNotEnoughPointsText
 	jr .print
 
 .BagFull:
-	ld hl, .Text_NoRoom
+	ld hl, .BuenaNoRoomText
 	jr .print
 
 .Purchase:
 	ld de, SFX_TRANSACTION
 	call PlaySFX
-	ld hl, .Text_HereYouGo
+	ld hl, .BuenaHereYouGoText
 
 .print
 	call BuenaPrintText
@@ -140,40 +140,35 @@ BuenaPrize:
 .done
 	call CloseWindow
 	call CloseWindow
-	ld hl, .Text_PleaseComeBackAgain
+	ld hl, .BuenaComeAgainText
 	call PrintText
 	call JoyWaitAorB
 	call PlayClickSFX
 	ret
 
-.Text_AskWhichPrize:
-	; Which prize would you like?
-	text_jump UnknownText_0x1c589f
-	db "@"
+.BuenaAskWhichPrizeText:
+	text_far _BuenaAskWhichPrizeText
+	text_end
 
-.Text_IsThatRight:
-	; ? Is that right?
-	text_jump UnknownText_0x1c58bc
-	db "@"
+.BuenaIsThatRightText:
+	text_far _BuenaIsThatRightText
+	text_end
 
-.Text_HereYouGo:	; Here you go!
-	text_jump UnknownText_0x1c58d1
-	db "@"
+.BuenaHereYouGoText:
+	text_far _BuenaHereYouGoText
+	text_end
 
-.Text_NotEnoughPoints:
-	; You don't have enough points.
-	text_jump UnknownText_0x1c58e0
-	db "@"
+.BuenaNotEnoughPointsText:
+	text_far _BuenaNotEnoughPointsText
+	text_end
 
-.Text_NoRoom:
-	; You have no room for it.
-	text_jump UnknownText_0x1c58ff
-	db "@"
+.BuenaNoRoomText:
+	text_far _BuenaNoRoomText
+	text_end
 
-.Text_PleaseComeBackAgain:
-	; Oh. Please come back again!
-	text_jump UnknownText_0x1c591a
-	db "@"
+.BuenaComeAgainText:
+	text_far _BuenaComeAgainText
+	text_end
 
 Buena_DisplayBlueCardBalance:
 	ld hl, BlueCardBalanceMenuHeader
@@ -188,7 +183,7 @@ PrintBlueCardBalance:
 .DrawBox:
 	push de
 	xor a
-	ld [hBGMapMode], a
+	ldh [hBGMapMode], a
 	ld hl, BlueCardBalanceMenuHeader
 	call CopyMenuHeader
 	call MenuBox
@@ -232,7 +227,7 @@ Buena_PrizeMenu:
 	ld [wMenuCursorBuffer], a
 	xor a
 	ld [wWhichIndexSet], a
-	ld [hBGMapMode], a
+	ldh [hBGMapMode], a
 	call InitScrollingMenu
 	call UpdateSprites
 	call ScrollingMenu
@@ -262,7 +257,7 @@ Buena_PrizeMenu:
 .MenuData:
 	db SCROLLINGMENU_DISPLAY_ARROWS ; flags
 	db 4, 13 ; rows, columns
-	db 1 ; spacing
+	db SCROLLINGMENU_ITEMS_NORMAL ; item format
 	dba .indices
 	dba .prizeitem
 	dba .prizepoints

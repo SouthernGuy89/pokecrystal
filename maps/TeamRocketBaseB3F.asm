@@ -1,4 +1,4 @@
-	const_def 2 ; object constants
+	object_const_def ; object_event constants
 	const TEAMROCKETBASEB3F_LANCE
 	const TEAMROCKETBASEB3F_ROCKET1
 	const TEAMROCKETBASEB3F_MOLTRES
@@ -25,7 +25,7 @@ TeamRocketBaseB3F_MapScripts:
 	callback MAPCALLBACK_TILES, .CheckGiovanniDoor
 
 .LanceGetsPassword:
-	priorityjump LanceGetPasswordScript
+	prioritysjump LanceGetPasswordScript
 	end
 
 .DummyScene1:
@@ -86,7 +86,7 @@ TeamRocketBaseB3FRocketScript:
 
 RocketBaseBossLeft:
 	applymovement PLAYER, MovementData_0x6e133
-	jump RocketBaseBoss
+	sjump RocketBaseBoss
 
 RocketBaseBossRight:
 	applymovement PLAYER, MovementData_0x6e13a
@@ -180,16 +180,16 @@ TeamRocketBaseB3FLockedDoor:
 	iffalse .NeedsPassword
 	checkevent EVENT_LEARNED_RATICATE_TAIL
 	iffalse .NeedsPassword
-	jump .OpenSesame
+	sjump .OpenSesame
 
 .NeedsPassword:
-	writetext UnknownText_0x6e970
+	writetext TeamRocketBaseB3FLockedDoorNeedsPasswordText
 	waitbutton
 	closetext
 	end
 
 .OpenSesame:
-	writetext UnknownText_0x6e9a3
+	writetext TeamRocketBaseB3FLockedDoorOpenSesameText
 	waitbutton
 	playsound SFX_ENTER_DOOR
 	changeblock 10, 8, $07 ; floor
@@ -547,14 +547,14 @@ ScientistMitchAfterBattleText:
 	line "excites me!"
 	done
 
-UnknownText_0x6e970:
+TeamRocketBaseB3FLockedDoorNeedsPasswordText:
 	text "The door's closed…"
 
 	para "It needs two"
 	line "passwords to open."
 	done
 
-UnknownText_0x6e9a3:
+TeamRocketBaseB3FLockedDoorOpenSesameText:
 	text "The door's closed…"
 
 	para "<PLAYER> entered"

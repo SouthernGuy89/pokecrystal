@@ -167,7 +167,7 @@ Slots_GetPals:
 	ld a, %11100100
 	call DmgToCgbBGPals
 	lb de, %11100100, %11100100
-	ld a, [hCGB]
+	ldh a, [hCGB]
 	and a
 	jr nz, .cgb
 	lb de, %11000000, %11100100
@@ -182,7 +182,7 @@ SlotsLoop:
 	call SlotsJumptable
 	call Slots_SpinReels
 	xor a
-	ld [wCurrSpriteOAMAddr], a
+	ld [wCurSpriteOAMAddr], a
 	callfar DoNextFrameForFirst16Sprites
 	call .PrintCoinsAndPayout
 	call .Stubbed_Function927d3
@@ -214,7 +214,7 @@ SlotsLoop:
 	ld a, [wTextDelayFrames]
 	and $7
 	ret nz
-	ld a, [rBGP]
+	ldh a, [rBGP]
 	xor %00001100
 	call DmgToCgbBGPals
 	ret
@@ -343,7 +343,7 @@ SlotsAction_WaitStart:
 .proceed
 	call SlotsAction_Next
 	xor a
-	ld [hJoypadSum], a
+	ldh [hJoypadSum], a
 	ret
 
 SlotsAction_WaitReel1:
@@ -365,7 +365,7 @@ SlotsAction_WaitStopReel1:
 	call Slots_LoadReelState
 	call SlotsAction_Next
 	xor a
-	ld [hJoypadSum], a
+	ldh [hJoypadSum], a
 SlotsAction_WaitReel2:
 	ld hl, hJoypadSum
 	ld a, [hl]
@@ -385,7 +385,7 @@ SlotsAction_WaitStopReel2:
 	call Slots_LoadReelState
 	call SlotsAction_Next
 	xor a
-	ld [hJoypadSum], a
+	ldh [hJoypadSum], a
 SlotsAction_WaitReel3:
 	ld hl, hJoypadSum
 	ld a, [hl]
@@ -405,7 +405,7 @@ SlotsAction_WaitStopReel3:
 	call Slots_LoadReelState
 	call SlotsAction_Next
 	xor a
-	ld [hJoypadSum], a
+	ldh [hJoypadSum], a
 	ret
 
 SlotsAction_FlashIfWin:
@@ -429,7 +429,7 @@ SlotsAction_FlashScreen:
 	srl a
 	ret z
 
-	ld a, [rOBP0]
+	ldh a, [rOBP0]
 	xor $ff
 	ld e, a
 	ld d, a
@@ -778,9 +778,9 @@ Slots_UpdateReelPositionAndOAM:
 	ld hl, REEL_X_COORD
 	add hl, bc
 	ld a, [hl]
-	ld [wCurrReelXCoord], a
+	ld [wCurReelXCoord], a
 	ld a, 10 * 8
-	ld [wCurrReelYCoord], a
+	ld [wCurReelYCoord], a
 	ld hl, REEL_POSITION
 	add hl, bc
 	ld e, [hl]
@@ -813,9 +813,9 @@ Slots_UpdateReelPositionAndOAM:
 	ld h, [hl]
 	ld l, a
 .loop
-	ld a, [wCurrReelYCoord]
+	ld a, [wCurReelYCoord]
 	ld [hli], a ; y
-	ld a, [wCurrReelXCoord]
+	ld a, [wCurReelXCoord]
 	ld [hli], a ; x
 	ld a, [de]
 	ld [hli], a ; tile id
@@ -824,9 +824,9 @@ Slots_UpdateReelPositionAndOAM:
 	set OAM_PRIORITY, a
 	ld [hli], a ; attributes
 
-	ld a, [wCurrReelYCoord]
+	ld a, [wCurReelYCoord]
 	ld [hli], a ; y
-	ld a, [wCurrReelXCoord]
+	ld a, [wCurReelXCoord]
 	add 1 * TILE_WIDTH
 	ld [hli], a ; x
 	ld a, [de]
@@ -838,9 +838,9 @@ Slots_UpdateReelPositionAndOAM:
 	set OAM_PRIORITY, a
 	ld [hli], a ; attributes
 	inc de
-	ld a, [wCurrReelYCoord]
+	ld a, [wCurReelYCoord]
 	sub 2 * TILE_WIDTH
-	ld [wCurrReelYCoord], a
+	ld [wCurReelYCoord], a
 	cp 2 * TILE_WIDTH
 	jr nz, .loop
 	ret
@@ -1412,35 +1412,35 @@ Slots_CheckMatchedFirstTwoReels:
 	ret
 
 .CheckBottomRow:
-	ld hl, wCurrReelStopped
+	ld hl, wCurReelStopped
 	ld a, [wReel1Stopped]
 	cp [hl]
 	call z, .StoreResult
 	ret
 
 .CheckUpwardsDiag:
-	ld hl, wCurrReelStopped + 1
+	ld hl, wCurReelStopped + 1
 	ld a, [wReel1Stopped]
 	cp [hl]
 	call z, .StoreResult
 	ret
 
 .CheckMiddleRow:
-	ld hl, wCurrReelStopped + 1
+	ld hl, wCurReelStopped + 1
 	ld a, [wReel1Stopped + 1]
 	cp [hl]
 	call z, .StoreResult
 	ret
 
 .CheckDownwardsDiag:
-	ld hl, wCurrReelStopped + 1
+	ld hl, wCurReelStopped + 1
 	ld a, [wReel1Stopped + 2]
 	cp [hl]
 	call z, .StoreResult
 	ret
 
 .CheckTopRow:
-	ld hl, wCurrReelStopped + 2
+	ld hl, wCurReelStopped + 2
 	ld a, [wReel1Stopped + 2]
 	cp [hl]
 	call z, .StoreResult
@@ -1509,7 +1509,7 @@ Slots_CheckMatchedAllThreeReels:
 	ret
 
 .CheckBottomRow:
-	ld hl, wCurrReelStopped
+	ld hl, wCurReelStopped
 	ld a, [wReel1Stopped]
 	cp [hl]
 	ret nz
@@ -1519,7 +1519,7 @@ Slots_CheckMatchedAllThreeReels:
 	ret
 
 .CheckUpwardsDiag:
-	ld hl, wCurrReelStopped + 2
+	ld hl, wCurReelStopped + 2
 	ld a, [wReel1Stopped]
 	cp [hl]
 	ret nz
@@ -1529,7 +1529,7 @@ Slots_CheckMatchedAllThreeReels:
 	ret
 
 .CheckMiddleRow:
-	ld hl, wCurrReelStopped + 1
+	ld hl, wCurReelStopped + 1
 	ld a, [wReel1Stopped + 1]
 	cp [hl]
 	ret nz
@@ -1539,7 +1539,7 @@ Slots_CheckMatchedAllThreeReels:
 	ret
 
 .CheckDownwardsDiag:
-	ld hl, wCurrReelStopped
+	ld hl, wCurReelStopped
 	ld a, [wReel1Stopped + 2]
 	cp [hl]
 	ret nz
@@ -1549,7 +1549,7 @@ Slots_CheckMatchedAllThreeReels:
 	ret
 
 .CheckTopRow:
-	ld hl, wCurrReelStopped + 2
+	ld hl, wCurReelStopped + 2
 	ld a, [wReel1Stopped + 2]
 	cp [hl]
 	ret nz
@@ -1563,7 +1563,7 @@ Slots_CheckMatchedAllThreeReels:
 	ret
 
 Slots_CopyReelState:
-	ld de, wCurrReelStopped
+	ld de, wCurReelStopped
 	ld a, [hli]
 	ld [de], a
 	inc de
@@ -1707,7 +1707,7 @@ Slots_TurnLightsOnOrOff:
 
 Slots_AskBet:
 .loop
-	ld hl, .Text_BetHowManyCoins
+	ld hl, .SlotsBetHowManyCoinsText
 	call PrintText
 	ld hl, .MenuHeader
 	call LoadMenuHeader
@@ -1727,7 +1727,7 @@ Slots_AskBet:
 	ld a, [hl]
 	cp c
 	jr nc, .Start
-	ld hl, .Text_NotEnoughCoins
+	ld hl, .SlotsNotEnoughCoinsText
 	call PrintText
 	jr .loop
 
@@ -1742,25 +1742,22 @@ Slots_AskBet:
 	call WaitSFX
 	ld de, SFX_PAY_DAY
 	call PlaySFX
-	ld hl, .Text_Start
+	ld hl, .SlotsStartText
 	call PrintText
 	and a
 	ret
 
-.Text_BetHowManyCoins:
-	; Bet how many coins?
-	text_jump UnknownText_0x1c5049
-	db "@"
+.SlotsBetHowManyCoinsText:
+	text_far _SlotsBetHowManyCoinsText
+	text_end
 
-.Text_Start:
-	; Start!
-	text_jump UnknownText_0x1c505e
-	db "@"
+.SlotsStartText:
+	text_far _SlotsStartText
+	text_end
 
-.Text_NotEnoughCoins:
-	; Not enough coins.
-	text_jump UnknownText_0x1c5066
-	db "@"
+.SlotsNotEnoughCoinsText:
+	text_far _SlotsNotEnoughCoinsText
+	text_end
 
 .MenuHeader:
 	db MENU_BACKUP_TILES ; flags
@@ -1780,16 +1777,16 @@ Slots_AskPlayAgain:
 	ld a, [hli]
 	or [hl]
 	jr nz, .you_have_coins
-	ld hl, .Text_OutOfCoins
+	ld hl, .SlotsRanOutOfCoinsText
 	call PrintText
 	ld c, 60
 	call DelayFrames
 	jr .exit_slots
 
 .you_have_coins
-	ld hl, .Text_PlayAgain
+	ld hl, .SlotsPlayAgainText
 	call PrintText
-	call LoadMenuTextBox
+	call LoadMenuTextbox
 	lb bc, 14, 12
 	call PlaceYesNoBox
 	ld a, [wMenuCursorY]
@@ -1804,13 +1801,13 @@ Slots_AskPlayAgain:
 	scf
 	ret
 
-.Text_OutOfCoins:
-	text_jump UnknownText_0x1c5079
-	db "@"
+.SlotsRanOutOfCoinsText:
+	text_far _SlotsRanOutOfCoinsText
+	text_end
 
-.Text_PlayAgain:
-	text_jump UnknownText_0x1c5092
-	db "@"
+.SlotsPlayAgainText:
+	text_far _SlotsPlayAgainText
+	text_end
 
 Slots_GetPayout:
 	ld a, [wSlotMatched]
@@ -1849,7 +1846,7 @@ Slots_PayoutText:
 	ld a, [wSlotMatched]
 	cp SLOTS_NO_MATCH
 	jr nz, .MatchedSomething
-	ld hl, .Text_Darn
+	ld hl, .SlotsDarnText
 	call PrintText
 	farcall StubbedTrainerRankings_EndSlotsWinStreak
 	ret
@@ -1887,7 +1884,7 @@ Slots_PayoutText:
 	dbw "15@@", .LinedUpMonOrCherry
 
 .Text_PrintPayout:
-	start_asm
+	text_asm
 	ld a, [wSlotMatched]
 	add $25
 	ldcoord_a 2, 13
@@ -1899,21 +1896,19 @@ Slots_PayoutText:
 	ldcoord_a 3, 14
 	hlcoord 18, 17
 	ld [hl], "▼"
-	ld hl, .Text_LinedUpWonCoins
+	ld hl, .SlotsLinedUpText
 rept 4
 	inc bc
 endr
 	ret
 
-.Text_LinedUpWonCoins:
-	; lined up! Won @  coins!
-	text_jump UnknownText_0x1c509f
-	db "@"
+.SlotsLinedUpText:
+	text_far _SlotsLinedUpText
+	text_end
 
-.Text_Darn:
-	; Darn!
-	text_jump UnknownText_0x1c50bb
-	db "@"
+.SlotsDarnText:
+	text_far _SlotsDarnText
+	text_end
 
 .LinedUpSevens:
 	ld a, SFX_2ND_PLACE
@@ -2042,7 +2037,7 @@ Slots_AnimateGolem:
 	xor $ff
 	inc a
 	ld [hl], a
-	ld [hSCY], a
+	ldh [hSCY], a
 	ret
 
 .restart
@@ -2050,7 +2045,7 @@ Slots_AnimateGolem:
 	add hl, bc
 	xor a
 	ld [hl], a
-	ld [hSCY], a
+	ldh [hSCY], a
 	ret
 
 Slots_AnimateChansey:

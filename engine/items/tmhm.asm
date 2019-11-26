@@ -1,9 +1,9 @@
 TMHMPocket:
 	ld a, $1
-	ld [hInMenu], a
+	ldh [hInMenu], a
 	call TMHM_PocketLoop
 	ld a, $0
-	ld [hInMenu], a
+	ldh [hInMenu], a
 	ret nc
 	call PlaceHollowCursor
 	call WaitBGMap
@@ -54,14 +54,14 @@ AskTeachTMHM:
 	ld [wPutativeTMHMMove], a
 	call GetMoveName
 	call CopyName1
-	ld hl, Text_BootedTM ; Booted up a TM
+	ld hl, BootedTMText ; Booted up a TM
 	ld a, [wCurItem]
 	cp HM01
 	jr c, .TM
-	ld hl, Text_BootedHM ; Booted up an HM
+	ld hl, BootedHMText ; Booted up an HM
 .TM:
 	call PrintText
-	ld hl, Text_ItContained
+	ld hl, ContainedMoveText
 	call PrintText
 	call YesNoBox
 .NotTMHM:
@@ -132,7 +132,7 @@ TeachTMHM:
 	ld de, SFX_WRONG
 	call PlaySFX
 	pop de
-	ld hl, Text_TMHMNotCompatible
+	ld hl, TMHMNotCompatibleText
 	call PrintText
 	jr .nope
 
@@ -166,29 +166,25 @@ TeachTMHM:
 	scf
 	ret
 
-Text_BootedTM:
-	; Booted up a TM.
-	text_jump UnknownText_0x1c0373
-	db "@"
+BootedTMText:
+	text_far _BootedTMText
+	text_end
 
-Text_BootedHM:
-	; Booted up an HM.
-	text_jump UnknownText_0x1c0384
-	db "@"
+BootedHMText:
+	text_far _BootedHMText
+	text_end
 
-Text_ItContained:
-	; It contained @ . Teach @ to a #MON?
-	text_jump UnknownText_0x1c0396
-	db "@"
+ContainedMoveText:
+	text_far _ContainedMoveText
+	text_end
 
-Text_TMHMNotCompatible:
-	; is not compatible with @ . It can't learn @ .
-	text_jump UnknownText_0x1c03c2
-	db "@"
+TMHMNotCompatibleText:
+	text_far _TMHMNotCompatibleText
+	text_end
 
 TMHM_PocketLoop:
 	xor a
-	ld [hBGMapMode], a
+	ldh [hBGMapMode], a
 	call TMHM_DisplayPocketItems
 	ld a, 2
 	ld [w2DMenuCursorInitY], a
@@ -227,7 +223,7 @@ TMHM_JoypadLoop:
 	dec a
 	ld [wTMHMPocketCursor], a
 	xor a
-	ld [hBGMapMode], a
+	ldh [hBGMapMode], a
 	ld a, [w2DMenuFlags2]
 	bit 7, a
 	jp nz, TMHM_ScrollPocket
@@ -247,7 +243,7 @@ TMHM_ShowTMMoveDescription:
 	hlcoord 0, 12
 	ld b, 4
 	ld c, SCREEN_WIDTH - 2
-	call TextBox
+	call Textbox
 	ld a, [wCurItem]
 	cp NUM_TMS + NUM_HMS + 1
 	jr nc, TMHM_JoypadLoop
@@ -375,7 +371,7 @@ TMHM_DisplayPocketItems:
 	ld [hl], "H"
 	inc hl
 	ld de, wTempTMHM
-	lb bc, PRINTNUM_RIGHTALIGN | 1, 2
+	lb bc, PRINTNUM_LEFTALIGN | 1, 2
 	call PrintNum
 	pop af
 	ld [wTempTMHM], a
@@ -491,21 +487,19 @@ TMHM_PlaySFX_ReadText2:
 Unreferenced_Function2cadf:
 	call ConvertCurItemIntoCurTMHM
 	call .CheckHaveRoomForTMHM
-	ld hl, .NoRoomText
+	ld hl, .NoRoomTMHMText
 	jr nc, .print
-	ld hl, .ReceivedText
+	ld hl, .ReceivedTMHMText
 .print
 	jp PrintText
 
-.NoRoomText:
-	; You have no room for any more @ S.
-	text_jump UnknownText_0x1c03fa
-	db "@"
+.NoRoomTMHMText:
+	text_far _NoRoomTMHMText
+	text_end
 
-.ReceivedText:
-	; You received @ !
-	text_jump UnknownText_0x1c0421
-	db "@"
+.ReceivedTMHMText:
+	text_far _ReceivedTMHMText
+	text_end
 
 .CheckHaveRoomForTMHM:
 	ld a, [wTempTMHM]

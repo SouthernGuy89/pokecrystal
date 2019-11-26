@@ -17,7 +17,7 @@ MobileCheckOwnMonAnywhere:
 	ld bc, PARTYMON_STRUCT_LENGTH
 	add hl, bc
 	pop bc
-	call .CopyName
+	call .AdvanceOTName
 	dec d
 	jr nz, .asm_4a851
 	ld a, BANK(sBoxCount)
@@ -39,7 +39,7 @@ MobileCheckOwnMonAnywhere:
 	ld bc, BOXMON_STRUCT_LENGTH
 	add hl, bc
 	pop bc
-	call .CopyName
+	call .AdvanceOTName
 	dec d
 	jr nz, .asm_4a873
 
@@ -90,7 +90,7 @@ MobileCheckOwnMonAnywhere:
 	ld bc, BOXMON_STRUCT_LENGTH
 	add hl, bc
 	pop bc
-	call .CopyName
+	call .AdvanceOTName
 	dec d
 	jr nz, .asm_4a8ba
 	pop bc
@@ -146,7 +146,7 @@ MobileCheckOwnMonAnywhere:
 	dba sBox13
 	dba sBox14
 
-.CopyName:
+.AdvanceOTName:
 	push hl
 	ld hl, NAME_LENGTH
 	add hl, bc
@@ -158,7 +158,7 @@ MobileCheckOwnMonAnywhere:
 UnusedFindItemInPCOrBag:
 	ld a, [wScriptVar]
 	ld [wCurItem], a
-	ld hl, wPCItems
+	ld hl, wNumPCItems
 	call CheckItem
 	jr c, .found
 
@@ -235,14 +235,13 @@ Function4a94e:
 .asm_4a9b0
 	ld de, SFX_WRONG
 	call PlaySFX
-	ld hl, UnknownText_0x4a9be
+	ld hl, MobilePickThreeMonForBattle
 	call PrintText
 	jr .asm_4a974
 
-UnknownText_0x4a9be:
-	; Pick three #MON for battle.
-	text_jump UnknownText_0x1c51d7
-	db "@"
+MobilePickThreeMonForBattle:
+	text_far _MobilePickThreeMonForBattle
+	text_end
 
 Function4a9c3:
 	ld hl, wd002
@@ -287,15 +286,14 @@ Function4a9d7:
 	ld de, wd012
 	ld bc, 6
 	call CopyBytes
-	ld hl, UnknownText_0x4aa1d
+	ld hl, MobileUseTheseThreeMonText
 	call PrintText
 	call YesNoBox
 	ret
 
-UnknownText_0x4aa1d:
-	; , @  and @ . Use these three?
-	text_jump UnknownText_0x1c51f4
-	db "@"
+MobileUseTheseThreeMonText:
+	text_far _MobileUseTheseThreeMonText
+	text_end
 
 Function4aa22:
 	call ClearBGPalettes
@@ -424,15 +422,15 @@ Function4aad3:
 
 	ld c, a
 	xor a
-	ld [hObjectStructIndexBuffer], a
+	ldh [hObjectStructIndexBuffer], a
 .loop
 	push bc
 	push hl
 	ld e, MONICON_PARTYMENU
 	farcall LoadMenuMonIcon
-	ld a, [hObjectStructIndexBuffer]
+	ldh a, [hObjectStructIndexBuffer]
 	inc a
-	ld [hObjectStructIndexBuffer], a
+	ldh [hObjectStructIndexBuffer], a
 	pop hl
 	pop bc
 	dec c
@@ -671,7 +669,7 @@ Function4ac58:
 	hlcoord 11, 13
 	ld b, $3
 	ld c, $7
-	call TextBox
+	call Textbox
 	hlcoord 13, 14
 	ld de, String_4ada7
 	call PlaceString
@@ -681,12 +679,12 @@ Function4ac58:
 	hlcoord 11, 9
 	ld b, $7
 	ld c, $7
-	call TextBox
+	call Textbox
 	call Function4ad68
 
 .asm_4ac96
 	ld a, $1
-	ld [hBGMapMode], a
+	ldh [hBGMapMode], a
 	call Function4acaa
 	call ExitMenu
 	and a
@@ -728,7 +726,7 @@ Function4acaa:
 	call StaticMenuJoypad
 	ld de, SFX_READ_TEXT_2
 	call PlaySFX
-	ld a, [hJoyPressed]
+	ldh a, [hJoyPressed]
 	bit 0, a
 	jr nz, .asm_4acf4
 	bit 1, a
@@ -772,7 +770,7 @@ Function4ad17:
 	jr z, .asm_4ad39
 	ld de, SFX_WRONG
 	call WaitPlaySFX
-	ld hl, UnknownText_0x4ad51
+	ld hl, MobileOnlyThreeMonMayEnterText
 	call PrintText
 	ret
 
@@ -792,10 +790,9 @@ Function4ad17:
 	call Function4adc2
 	ret
 
-UnknownText_0x4ad51:
-	; Only three #MON may enter.
-	text_jump UnknownText_0x1c521c
-	db "@"
+MobileOnlyThreeMonMayEnterText:
+	text_far _MobileOnlyThreeMonMayEnterText
+	text_end
 
 Function4ad56:
 	farcall OpenPartyStats

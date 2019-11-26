@@ -1,10 +1,10 @@
 WriteOAMDMACodeToHRAM::
-	ld c, hTransferVirtualOAM - $ff00
+	ld c, LOW(hTransferVirtualOAM)
 	ld b, .PushOAMEnd - .PushOAM
 	ld hl, .PushOAM
 .loop
 	ld a, [hli]
-	ld [$ff00+c], a
+	ldh [c], a
 	inc c
 	dec b
 	jr nz, .loop
@@ -12,7 +12,7 @@ WriteOAMDMACodeToHRAM::
 
 .PushOAM:
 	ld a, HIGH(wVirtualOAM)
-	ld [rDMA], a
+	ldh [rDMA], a
 	ld a, NUM_SPRITE_OAM_STRUCTS
 .pushoam_loop
 	dec a

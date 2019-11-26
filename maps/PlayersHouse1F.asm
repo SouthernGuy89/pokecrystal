@@ -1,4 +1,4 @@
-	const_def 2 ; object constants
+	object_const_def ; object_event constants
 	const PLAYERSHOUSE1F_MOM1
 	const PLAYERSHOUSE1F_MOM2
 	const PLAYERSHOUSE1F_MOM3
@@ -27,16 +27,16 @@ MeetMomRightScript:
 	turnobject PLAYER, LEFT
 	checkevent EVENT_TEMPORARY_UNTIL_MAP_RELOAD_1
 	iffalse .OnRight
-	applymovement PLAYERSHOUSE1F_MOM1, MovementData_0x7a5fc
-	jump MeetMomScript
+	applymovement PLAYERSHOUSE1F_MOM1, MomTurnsTowardPlayerMovement
+	sjump MeetMomScript
 
 .OnRight:
-	applymovement PLAYERSHOUSE1F_MOM1, MovementData_0x7a5fe
+	applymovement PLAYERSHOUSE1F_MOM1, MomWalksToPlayerMovement
 MeetMomScript:
 	opentext
-	writetext UnknownText_0x7a604
-	buttonsound
-	stringtotext GearName, MEM_BUFFER_1
+	writetext ElmsLookingForYouText
+	promptbutton
+	getstring STRING_BUFFER_4, PokegearName
 	scall PlayersHouse1FReceiveItemStd
 	setflag ENGINE_POKEGEAR
 	setflag ENGINE_PHONE_CARD
@@ -44,55 +44,55 @@ MeetMomScript:
 	setscene SCENE_FINISHED
 	setevent EVENT_PLAYERS_HOUSE_MOM_1
 	clearevent EVENT_PLAYERS_HOUSE_MOM_2
-	writetext UnknownText_0x7a6bd
-	buttonsound
+	writetext MomGivesPokegearText
+	promptbutton
 	special SetDayOfWeek
 .SetDayOfWeek:
-	writetext UnknownText_0x7a742
+	writetext IsItDSTText
 	yesorno
 	iffalse .WrongDay
 	special InitialSetDSTFlag
 	yesorno
 	iffalse .SetDayOfWeek
-	jump .DayOfWeekDone
+	sjump .DayOfWeekDone
 
 .WrongDay:
 	special InitialClearDSTFlag
 	yesorno
 	iffalse .SetDayOfWeek
 .DayOfWeekDone:
-	writetext UnknownText_0x7a763
+	writetext ComeHomeForDSTText
 	yesorno
 	iffalse .ExplainPhone
-	jump .KnowPhone
+	sjump .KnowPhone
 
 .KnowPhone:
-	writetext UnknownText_0x7a7cb
-	buttonsound
-	jump .FinishPhone
+	writetext KnowTheInstructionsText
+	promptbutton
+	sjump .FinishPhone
 
 .ExplainPhone:
-	writetext UnknownText_0x7a807
-	buttonsound
-	jump .FinishPhone
+	writetext DontKnowTheInstructionsText
+	promptbutton
+	sjump .FinishPhone
 
 .FinishPhone:
-	writetext UnknownText_0x7a850
+	writetext InstructionsNextText
 	waitbutton
 	closetext
 	checkevent EVENT_TEMPORARY_UNTIL_MAP_RELOAD_1
 	iftrue .FromRight
 	checkevent EVENT_TEMPORARY_UNTIL_MAP_RELOAD_2
 	iffalse .FromLeft
-	jump .Finish
+	sjump .Finish
 
 .FromRight:
-	applymovement PLAYERSHOUSE1F_MOM1, MovementData_0x7a600
-	jump .Finish
+	applymovement PLAYERSHOUSE1F_MOM1, MomTurnsBackMovement
+	sjump .Finish
 
 .FromLeft:
-	applymovement PLAYERSHOUSE1F_MOM1, MovementData_0x7a602
-	jump .Finish
+	applymovement PLAYERSHOUSE1F_MOM1, MomWalksBackMovement
+	sjump .Finish
 
 .Finish:
 	special RestartMapMusic
@@ -101,9 +101,9 @@ MeetMomScript:
 
 MeetMomTalkedScript:
 	playmusic MUSIC_MOM
-	jump MeetMomScript
+	sjump MeetMomScript
 
-GearName:
+PokegearName:
 	db "#GEAR@"
 
 PlayersHouse1FReceiveItemStd:
@@ -124,19 +124,19 @@ MomScript:
 	iftrue .GaveMysteryEgg
 	checkevent EVENT_GOT_A_POKEMON_FROM_ELM
 	iftrue .GotAPokemon
-	writetext UnknownText_0x7a8b5
+	writetext HurryUpElmIsWaitingText
 	waitbutton
 	closetext
 	end
 
 .GotAPokemon:
-	writetext UnknownText_0x7a8e5
+	writetext SoWhatWasProfElmsErrandText
 	waitbutton
 	closetext
 	end
 
 .FirstTimeBanking:
-	writetext UnknownText_0x7a957
+	writetext ImBehindYouText
 	waitbutton
 	closetext
 	end
@@ -162,18 +162,18 @@ NeighborScript:
 
 .MornScript:
 	writetext NeighborMornIntroText
-	buttonsound
-	jump .Main
+	promptbutton
+	sjump .Main
 
 .DayScript:
 	writetext NeighborDayIntroText
-	buttonsound
-	jump .Main
+	promptbutton
+	sjump .Main
 
 .NiteScript:
 	writetext NeighborNiteIntroText
-	buttonsound
-	jump .Main
+	promptbutton
+	sjump .Main
 
 .Main:
 	writetext NeighborText
@@ -194,23 +194,23 @@ SinkScript:
 FridgeScript:
 	jumptext FridgeText
 
-MovementData_0x7a5fc:
+MomTurnsTowardPlayerMovement:
 	turn_head RIGHT
 	step_end
 
-MovementData_0x7a5fe:
+MomWalksToPlayerMovement:
 	slow_step RIGHT
 	step_end
 
-MovementData_0x7a600:
+MomTurnsBackMovement:
 	turn_head LEFT
 	step_end
 
-MovementData_0x7a602:
+MomWalksBackMovement:
 	slow_step LEFT
 	step_end
 
-UnknownText_0x7a604:
+ElmsLookingForYouText:
 	text "Oh, <PLAYER>…! Our"
 	line "neighbor, PROF."
 
@@ -230,7 +230,7 @@ UnknownText_0x7a604:
 	para "Here you go!"
 	done
 
-UnknownText_0x7a6bd:
+MomGivesPokegearText:
 	text "#MON GEAR, or"
 	line "just #GEAR."
 
@@ -245,12 +245,12 @@ UnknownText_0x7a6bd:
 	line "that!"
 	done
 
-UnknownText_0x7a742:
+IsItDSTText:
 	text "Is it Daylight"
 	line "Saving Time now?"
 	done
 
-UnknownText_0x7a763:
+ComeHomeForDSTText:
 	text "Come home to"
 	line "adjust your clock"
 
@@ -262,7 +262,7 @@ UnknownText_0x7a763:
 	cont "the PHONE?"
 	done
 
-UnknownText_0x7a7cb:
+KnowTheInstructionsText:
 	text "Don't you just"
 	line "turn the #GEAR"
 
@@ -270,7 +270,7 @@ UnknownText_0x7a7cb:
 	line "PHONE icon?"
 	done
 
-UnknownText_0x7a807:
+DontKnowTheInstructionsText:
 	text "I'll read the"
 	line "instructions."
 
@@ -279,7 +279,7 @@ UnknownText_0x7a807:
 	cont "PHONE icon."
 	done
 
-UnknownText_0x7a850:
+InstructionsNextText:
 	text "Phone numbers are"
 	line "stored in memory."
 
@@ -290,14 +290,14 @@ UnknownText_0x7a850:
 	line "convenient?"
 	done
 
-UnknownText_0x7a8b5:
+HurryUpElmIsWaitingText:
 	text "PROF.ELM is wait-"
 	line "ing for you."
 
 	para "Hurry up, baby!"
 	done
 
-UnknownText_0x7a8e5:
+SoWhatWasProfElmsErrandText:
 	text "So, what was PROF."
 	line "ELM's errand?"
 
@@ -311,7 +311,7 @@ UnknownText_0x7a8e5:
 	cont "rely on you."
 	done
 
-UnknownText_0x7a957:
+ImBehindYouText:
 	text "<PLAYER>, do it!"
 
 	para "I'm behind you all"

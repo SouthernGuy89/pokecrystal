@@ -20,7 +20,7 @@ GetSpriteVTile::
 	ld hl, wUsedSprites + 2
 	ld c, SPRITE_GFX_LIST_CAPACITY - 1
 	ld b, a
-	ld a, [hMapObjectIndexBuffer]
+	ldh a, [hMapObjectIndexBuffer]
 	cp 0
 	jr z, .nope
 	ld a, b
@@ -54,7 +54,7 @@ DoesSpriteHaveFacings::
 	push hl
 
 	ld b, a
-	ld a, [hROMBank]
+	ldh a, [hROMBank]
 	push af
 	ld a, BANK(_DoesSpriteHaveFacings)
 	rst Bankswitch
@@ -96,7 +96,7 @@ GetTileCollision::
 	ld d, 0
 	add hl, de
 
-	ld a, [hROMBank]
+	ldh a, [hROMBank]
 	push af
 	ld a, BANK(TileCollisionTable)
 	rst Bankswitch
@@ -202,7 +202,7 @@ CheckStandingOnEntrance::
 GetMapObject::
 ; Return the location of map object a in bc.
 	ld hl, wMapObjects
-	ld bc, OBJECT_LENGTH
+	ld bc, MAPOBJECT_LENGTH
 	call AddNTimes
 	ld b, h
 	ld c, l
@@ -210,14 +210,14 @@ GetMapObject::
 
 CheckObjectVisibility::
 ; Sets carry if the object is not visible on the screen.
-	ld [hMapObjectIndexBuffer], a
+	ldh [hMapObjectIndexBuffer], a
 	call GetMapObject
 	ld hl, MAPOBJECT_OBJECT_STRUCT_ID
 	add hl, bc
 	ld a, [hl]
 	cp -1
 	jr z, .not_visible
-	ld [hObjectStructIndexBuffer], a
+	ldh [hObjectStructIndexBuffer], a
 	call GetObjectStruct
 	and a
 	ret
@@ -301,21 +301,21 @@ CheckObjectTime::
 	ret
 
 ; unused
-	ld [hMapObjectIndexBuffer], a
+	ldh [hMapObjectIndexBuffer], a
 	call GetMapObject
 	call CopyObjectStruct
 	ret
 
 _CopyObjectStruct::
-	ld [hMapObjectIndexBuffer], a
+	ldh [hMapObjectIndexBuffer], a
 	call UnmaskObject
-	ld a, [hMapObjectIndexBuffer]
+	ldh a, [hMapObjectIndexBuffer]
 	call GetMapObject
 	farcall CopyObjectStruct
 	ret
 
 ApplyDeletionToMapObject::
-	ld [hMapObjectIndexBuffer], a
+	ldh [hMapObjectIndexBuffer], a
 	call GetMapObject
 	ld hl, MAPOBJECT_OBJECT_STRUCT_ID
 	add hl, bc
@@ -358,7 +358,7 @@ CopyPlayerObjectTemplate::
 	ld [de], a
 	inc de
 	pop hl
-	ld bc, OBJECT_LENGTH - 1
+	ld bc, MAPOBJECT_LENGTH - 1
 	call CopyBytes
 	ret
 
@@ -370,7 +370,7 @@ Unreferenced_Function19b8:
 	push af
 	ld [hl], -1
 	inc hl
-	ld bc, OBJECT_LENGTH - 1
+	ld bc, MAPOBJECT_LENGTH - 1
 	xor a
 	call ByteFill
 	pop af
@@ -394,12 +394,12 @@ Unreferenced_Function19b8:
 LoadMovementDataPointer::
 ; Load the movement data pointer for object a.
 	ld [wMovementObject], a
-	ld a, [hROMBank]
-	ld [wMovementDataPointer], a
+	ldh a, [hROMBank]
+	ld [wMovementDataBank], a
 	ld a, l
-	ld [wMovementDataPointer + 1], a
+	ld [wMovementDataAddress], a
 	ld a, h
-	ld [wMovementDataPointer + 2], a
+	ld [wMovementDataAddress + 1], a
 	ld a, [wMovementObject]
 	call CheckObjectVisibility
 	ret c
@@ -424,7 +424,7 @@ FindFirstEmptyObjectStruct::
 	push bc
 	push de
 	ld hl, wObjectStructs
-	ld de, OBJECT_STRUCT_LENGTH
+	ld de, OBJECT_LENGTH
 	ld c, NUM_OBJECT_STRUCTS
 .loop
 	ld a, [hl]
@@ -484,7 +484,7 @@ endr
 
 CopySpriteMovementData::
 	ld l, a
-	ld a, [hROMBank]
+	ldh a, [hROMBank]
 	push af
 	ld a, BANK(SpriteMovementData)
 	rst Bankswitch
@@ -551,7 +551,7 @@ endr
 
 _GetMovementByte::
 ; Switch to the movement data bank
-	ld a, [hROMBank]
+	ldh a, [hROMBank]
 	push af
 	ld a, [hli]
 	rst Bankswitch
@@ -594,7 +594,7 @@ UpdateSprites::
 	ret
 
 GetObjectStruct::
-	ld bc, OBJECT_STRUCT_LENGTH
+	ld bc, OBJECT_LENGTH
 	ld hl, wObjectStructs
 	call AddNTimes
 	ld b, h

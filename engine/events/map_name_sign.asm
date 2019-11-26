@@ -2,7 +2,7 @@ MAP_NAME_SIGN_START EQU $60
 
 ReturnFromMapSetupScript::
 	xor a
-	ld [hBGMapMode], a
+	ldh [hBGMapMode], a
 	farcall .inefficient_farcall ; this is a waste of 6 ROM bytes and 6 stack bytes
 	ret
 
@@ -13,17 +13,17 @@ ReturnFromMapSetupScript::
 	ld a, [wMapNumber]
 	ld c, a
 	call GetWorldMapLocation
-	ld [wCurrentLandmark], a
+	ld [wCurLandmark], a
 	call .CheckNationalParkGate
-	jr z, .nationalparkgate
+	jr z, .gate
 
 	call GetMapEnvironment
 	cp GATE
 	jr nz, .not_gate
 
-.nationalparkgate
+.gate
 	ld a, -1
-	ld [wCurrentLandmark], a
+	ld [wCurLandmark], a
 
 .not_gate
 	ld hl, wEnteredMapFromContinue
@@ -33,8 +33,8 @@ ReturnFromMapSetupScript::
 
 	call .CheckMovingWithinLandmark
 	jr z, .dont_do_map_sign
-	ld a, [wCurrentLandmark]
-	ld [wPreviousLandmark], a
+	ld a, [wCurLandmark]
+	ld [wPrevLandmark], a
 
 	call .CheckSpecialMap
 	jr z, .dont_do_map_sign
@@ -48,19 +48,19 @@ ReturnFromMapSetupScript::
 	ret
 
 .dont_do_map_sign
-	ld a, [wCurrentLandmark]
-	ld [wPreviousLandmark], a
+	ld a, [wCurLandmark]
+	ld [wPrevLandmark], a
 	ld a, $90
-	ld [rWY], a
-	ld [hWY], a
+	ldh [rWY], a
+	ldh [hWY], a
 	xor a
-	ld [hLCDCPointer], a
+	ldh [hLCDCPointer], a
 	ret
 
 .CheckMovingWithinLandmark:
-	ld a, [wCurrentLandmark]
+	ld a, [wCurLandmark]
 	ld c, a
-	ld a, [wPreviousLandmark]
+	ld a, [wPrevLandmark]
 	cp c
 	ret z
 	cp SPECIAL_MAP
@@ -70,7 +70,7 @@ ReturnFromMapSetupScript::
 ; These landmarks do not get pop-up signs.
 	cp -1
 	ret z
-	cp SPECIAL_MAP
+	cp SPECIAL_MAP ; redundant check
 	ret z
 	cp RADIO_TOWER
 	ret z
@@ -105,23 +105,23 @@ PlaceMapNameSign::
 	cp 60
 	ret z
 	cp 59
-	jr nz, .skip2
+	jr nz, .already_initialized
 	call InitMapNameFrame
 	call PlaceMapNameCenterAlign
 	farcall HDMATransfer_OnlyTopFourRows
-.skip2
+.already_initialized
 	ld a, $80
 	ld a, $70
-	ld [rWY], a
-	ld [hWY], a
+	ldh [rWY], a
+	ldh [hWY], a
 	ret
 
 .disappear
 	ld a, $90
-	ld [rWY], a
-	ld [hWY], a
+	ldh [rWY], a
+	ldh [hWY], a
 	xor a
-	ld [hLCDCPointer], a
+	ldh [hLCDCPointer], a
 	ret
 
 LoadMapNameSignGFX:
@@ -140,7 +140,7 @@ InitMapNameFrame:
 	ret
 
 PlaceMapNameCenterAlign:
-	ld a, [wCurrentLandmark]
+	ld a, [wCurLandmark]
 	ld e, a
 	farcall GetLandmarkName
 	call .GetNameLength
@@ -242,7 +242,7 @@ PlaceMapNameFrame:
 	ret
 
 .FillTopBottom:
-	ld c, 5
+	ld c, (SCREEN_WIDTH - 2) / 4 + 1
 	jr .enterloop
 
 .continueloop

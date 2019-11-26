@@ -1,4 +1,4 @@
-	const_def 2 ; object constants
+	object_const_def ; object_event constants
 	const CELADONMANSIONROOFHOUSE_PHARMACIST
 
 CeladonMansionRoofHouse_MapScripts:
@@ -11,34 +11,34 @@ CeladonMansionRoofHousePharmacistScript:
 	opentext
 	checkevent EVENT_GOT_TM03_CURSE
 	iftrue .GotCurse
-	writetext UnknownText_0x71b27
-	buttonsound
+	writetext CeladonMansionRoofHousePharmacistIntroText
+	promptbutton
 	checktime NITE
 	iftrue .Night
-	writetext UnknownText_0x71b4a
+	writetext CeladonMansionRoofHousePharmacistNotNightText
 	waitbutton
 	closetext
 	end
 
 .Night:
-	writetext UnknownText_0x71ba3
-	buttonsound
+	writetext CeladonMansionRoofHousePharmacistStoryText
+	promptbutton
 	verbosegiveitem TM_CURSE
 	iffalse .NoRoom
 	setevent EVENT_GOT_TM03_CURSE
 .GotCurse:
-	writetext UnknownText_0x71db3
+	writetext CeladonMansionRoofHousePharmacistCurseText
 	waitbutton
 .NoRoom:
 	closetext
 	end
 
-UnknownText_0x71b27:
+CeladonMansionRoofHousePharmacistIntroText:
 	text "Let me recount a"
 	line "terrifying tale…"
 	done
 
-UnknownText_0x71b4a:
+CeladonMansionRoofHousePharmacistNotNightText:
 	text "Then again, it's"
 	line "not as scary while"
 
@@ -49,7 +49,7 @@ UnknownText_0x71b4a:
 	line "sunset, OK?"
 	done
 
-UnknownText_0x71ba3:
+CeladonMansionRoofHousePharmacistStoryText:
 	text "Once upon a time,"
 	line "there was a little"
 
@@ -104,7 +104,7 @@ UnknownText_0x71ba3:
 	cont "take this--TM03!"
 	done
 
-UnknownText_0x71db3:
+CeladonMansionRoofHousePharmacistCurseText:
 	text "TM03 is CURSE."
 
 	para "It's a terrifying"
